@@ -1,20 +1,20 @@
 'use client'
 
 import {
-  Button,
-  Menu,
-  MenuButton,
-  MenuList,
-  MenuItem,
-  Text,
-  HStack,
-  Avatar,
-  useToast,
-  Spinner,
+    Avatar,
+    Button,
+    HStack,
+    Menu,
+    MenuButton,
+    MenuItem,
+    MenuList,
+    Spinner,
+    Text,
+    useToast,
 } from '@chakra-ui/react'
-import { ChevronDownIcon } from '@chakra-ui/icons'
-import { useAccount, useConnect, useDisconnect } from 'wagmi'
+// import { ChevronDownIcon } from '@chakra-ui/icons'
 import { useEffect } from 'react'
+import { useAccount, useConnect, useDisconnect } from 'wagmi'
 
 export function WalletConnectButton() {
   const { address, isConnected, isConnecting } = useAccount()
@@ -64,7 +64,7 @@ export function WalletConnectButton() {
   if (isConnected && address) {
     return (
       <Menu>
-        <MenuButton as={Button} rightIcon={<ChevronDownIcon />} variant="outline">
+        <MenuButton as={Button} variant="outline">
           <HStack spacing={2}>
             <Avatar size="xs" name={address} />
             <Text>{formatAddress(address)}</Text>
@@ -81,7 +81,7 @@ export function WalletConnectButton() {
 
   return (
     <Menu>
-      <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
+      <MenuButton as={Button}>
         Connect Wallet
       </MenuButton>
       <MenuList>

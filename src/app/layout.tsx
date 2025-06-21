@@ -13,7 +13,11 @@ export const metadata: Metadata = {
   description: 'Trade cryptocurrencies seamlessly across multiple blockchains with ChainBridge DEX. Support for Ethereum, Polygon, Arbitrum, and Optimism.',
   keywords: ['DeFi', 'DEX', 'Cross-chain', 'Ethereum', 'Polygon', 'Arbitrum', 'Optimism', 'Cryptocurrency'],
   authors: [{ name: 'ChainBridge DEX Team' }],
-  viewport: 'width=device-width, initial-scale=1',
+}
+
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
   themeColor: [
     { media: '(prefers-color-scheme: light)', color: '#3b82f6' },
     { media: '(prefers-color-scheme: dark)', color: '#1e40af' },

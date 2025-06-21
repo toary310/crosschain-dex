@@ -1,30 +1,29 @@
 'use client'
 
 import {
-  Box,
-  Flex,
-  HStack,
-  Text,
-  Button,
-  useColorMode,
-  useColorModeValue,
-  IconButton,
-  Menu,
-  MenuButton,
-  MenuList,
-  MenuItem,
-  Select,
+    Box,
+    Button,
+    Flex,
+    HStack,
+    Menu,
+    MenuButton,
+    MenuItem,
+    MenuList,
+    Select,
+    Text,
+    useColorMode,
+    useColorModeValue
 } from '@chakra-ui/react'
-import { MoonIcon, SunIcon, HamburgerIcon } from '@chakra-ui/icons'
+// import { MoonIcon, SunIcon, HamburgerIcon } from '@chakra-ui/icons'
 import { WalletConnectButton } from '@/components/WalletConnect/WalletConnectButton'
+import { getChainConfig, supportedChains } from '@/config/chains'
 import { useAccount, useChainId, useSwitchChain } from 'wagmi'
-import { supportedChains, getChainConfig } from '@/config/chains'
 
 export function Header() {
   const { colorMode, toggleColorMode } = useColorMode()
   const bg = useColorModeValue('white', 'gray.800')
   const borderColor = useColorModeValue('gray.200', 'gray.700')
-  
+
   const { isConnected } = useAccount()
   const chainId = useChainId()
   const { switchChain } = useSwitchChain()
@@ -84,13 +83,14 @@ export function Header() {
           )}
 
           {/* Color Mode Toggle */}
-          <IconButton
+          <Button
             aria-label="Toggle color mode"
-            icon={colorMode === 'light' ? <MoonIcon /> : <SunIcon />}
             onClick={toggleColorMode}
             variant="ghost"
             size="sm"
-          />
+          >
+            {colorMode === 'light' ? '?' : '??'}
+          </Button>
 
           {/* Wallet Connect */}
           <WalletConnectButton />
@@ -98,12 +98,13 @@ export function Header() {
           {/* Mobile Menu */}
           <Menu>
             <MenuButton
-              as={IconButton}
+              as={Button}
               aria-label="Open menu"
-              icon={<HamburgerIcon />}
               variant="ghost"
               display={{ base: 'flex', md: 'none' }}
-            />
+            >
+              ?
+            </MenuButton>
             <MenuList>
               <MenuItem>Swap</MenuItem>
               <MenuItem>Liquidity</MenuItem>
