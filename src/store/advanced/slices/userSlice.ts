@@ -1,5 +1,5 @@
 import { StateCreator } from 'zustand'
-import { UserPreferences, Store } from '../types'
+import { Store, UserPreferences } from '../types'
 
 // Default user preferences
 const defaultUserPreferences: UserPreferences = {
@@ -32,10 +32,10 @@ export const createUserSlice: StateCreator<
   user: defaultUserPreferences,
 
   // Actions
-  updateUserPreferences: (preferences) =>
-    set((state) => {
+  updateUserPreferences: (preferences: Partial<UserPreferences>) =>
+    set((state: Store) => {
       Object.assign(state.user, preferences)
-      
+
       // Track preference changes
       state.trackEvent('user_preferences_updated', {
         changes: Object.keys(preferences),
@@ -44,9 +44,9 @@ export const createUserSlice: StateCreator<
     }),
 
   resetUserPreferences: () =>
-    set((state) => {
+    set((state: Store) => {
       state.user = { ...defaultUserPreferences }
-      
+
       state.trackEvent('user_preferences_reset', {
         timestamp: Date.now(),
       })

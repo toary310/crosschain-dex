@@ -1,45 +1,43 @@
 'use client'
 
-import React, { useState, useMemo } from 'react'
-import {
-  Box,
-  VStack,
-  HStack,
-  Text,
-  Button,
-  ButtonGroup,
-  Grid,
-  GridItem,
-  useColorModeValue,
-  Badge,
-  Tooltip,
-  Select,
-} from '@chakra-ui/react'
-import {
-  PieChart,
-  Pie,
-  Cell,
-  AreaChart,
-  Area,
-  LineChart,
-  Line,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip as RechartsTooltip,
-  ResponsiveContainer,
-  Legend,
-  ComposedChart,
-  ReferenceLine,
-} from 'recharts'
-import { motion } from 'framer-motion'
 import { useScrollAnimation, useStaggerAnimation } from '@/hooks/useAnimations'
 import { usePortfolioStore } from '@/store/advanced/store'
+import {
+    Badge,
+    Box,
+    Button,
+    ButtonGroup,
+    Grid,
+    GridItem,
+    HStack,
+    Select,
+    Text,
+    useColorModeValue,
+    VStack
+} from '@chakra-ui/react'
+import { motion } from 'framer-motion'
+import React, { useMemo, useState } from 'react'
+import {
+    Area,
+    Bar,
+    CartesianGrid,
+    Cell,
+    ComposedChart,
+    Legend,
+    Line,
+    LineChart,
+    Pie,
+    PieChart,
+    Tooltip as RechartsTooltip,
+    ReferenceLine,
+    ResponsiveContainer,
+    XAxis,
+    YAxis
+} from 'recharts'
 
 const MotionBox = motion(Box)
 const MotionGrid = motion(Grid)
+const MotionGridItem = motion(GridItem)
 
 export interface PortfolioChartsProps {
   timeRange?: '24h' | '7d' | '30d' | '90d' | '1y' | 'all'
@@ -56,7 +54,7 @@ export const PortfolioCharts: React.FC<PortfolioChartsProps> = ({
 }) => {
   const [selectedTimeRange, setSelectedTimeRange] = useState(timeRange)
   const [selectedMetric, setSelectedMetric] = useState<'value' | 'pnl' | 'allocation'>('value')
-  
+
   const { ref, variants, isInView } = useScrollAnimation()
   const { staggerVariants, childVariants } = useStaggerAnimation()
   const { portfolio } = usePortfolioStore()
@@ -65,7 +63,7 @@ export const PortfolioCharts: React.FC<PortfolioChartsProps> = ({
   const bg = useColorModeValue('white', 'gray.800')
   const borderColor = useColorModeValue('gray.200', 'gray.600')
   const textColor = useColorModeValue('gray.600', 'gray.400')
-  
+
   // Color palette for charts
   const colors = [
     '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6',
@@ -137,7 +135,7 @@ export const PortfolioCharts: React.FC<PortfolioChartsProps> = ({
               <Box w={3} h={3} bg={entry.color} borderRadius="sm" />
               <Text fontSize="sm" color={textColor}>{entry.name}:</Text>
               <Text fontSize="sm" fontWeight="semibold">
-                {entry.name === 'PnL' ? 
+                {entry.name === 'PnL' ?
                   `${entry.value >= 0 ? '+' : ''}${entry.value.toFixed(2)}%` :
                   `$${entry.value.toLocaleString()}`
                 }
@@ -163,7 +161,7 @@ export const PortfolioCharts: React.FC<PortfolioChartsProps> = ({
           <Text fontSize="xl" fontWeight="bold">
             Portfolio Analytics
           </Text>
-          
+
           <HStack spacing={4}>
             <ButtonGroup size="sm" isAttached>
               {['24h', '7d', '30d', '90d', '1y', 'all'].map(range => (
@@ -176,7 +174,7 @@ export const PortfolioCharts: React.FC<PortfolioChartsProps> = ({
                 </Button>
               ))}
             </ButtonGroup>
-            
+
             <Select
               size="sm"
               value={selectedMetric}
@@ -218,7 +216,7 @@ export const PortfolioCharts: React.FC<PortfolioChartsProps> = ({
                       {selectedTimeRange}
                     </Badge>
                   </HStack>
-                  
+
                   <Box flex={1}>
                     <ResponsiveContainer width="100%" height="100%">
                       <ComposedChart data={performanceData}>
@@ -235,7 +233,7 @@ export const PortfolioCharts: React.FC<PortfolioChartsProps> = ({
                           tickFormatter={(value) => `$${value.toLocaleString()}`}
                         />
                         <RechartsTooltip content={<PerformanceTooltip />} />
-                        
+
                         <Area
                           type="monotone"
                           dataKey="totalValue"
@@ -244,7 +242,7 @@ export const PortfolioCharts: React.FC<PortfolioChartsProps> = ({
                           fillOpacity={0.1}
                           strokeWidth={2}
                         />
-                        
+
                         <Line
                           type="monotone"
                           dataKey="benchmark"
@@ -253,7 +251,7 @@ export const PortfolioCharts: React.FC<PortfolioChartsProps> = ({
                           strokeDasharray="5 5"
                           dot={false}
                         />
-                        
+
                         <ReferenceLine y={0} stroke={textColor} strokeDasharray="2 2" />
                       </ComposedChart>
                     </ResponsiveContainer>
@@ -278,7 +276,7 @@ export const PortfolioCharts: React.FC<PortfolioChartsProps> = ({
                   <Text fontSize="lg" fontWeight="semibold">
                     Asset Allocation
                   </Text>
-                  
+
                   <Box flex={1}>
                     <ResponsiveContainer width="100%" height="100%">
                       <PieChart>
@@ -328,7 +326,7 @@ export const PortfolioCharts: React.FC<PortfolioChartsProps> = ({
                   <Text fontSize="lg" fontWeight="semibold">
                     Profit & Loss Analysis
                   </Text>
-                  
+
                   <Box flex={1}>
                     <ResponsiveContainer width="100%" height="100%">
                       <ComposedChart data={performanceData}>
@@ -345,13 +343,13 @@ export const PortfolioCharts: React.FC<PortfolioChartsProps> = ({
                           tickFormatter={(value) => `${value}%`}
                         />
                         <RechartsTooltip content={<PerformanceTooltip />} />
-                        
+
                         <Bar
                           dataKey="dailyPnL"
                           fill={(data: any) => data.dailyPnL >= 0 ? colors[2] : colors[3]}
                           fillOpacity={0.8}
                         />
-                        
+
                         <Line
                           type="monotone"
                           dataKey="cumulativePnL"
@@ -359,7 +357,7 @@ export const PortfolioCharts: React.FC<PortfolioChartsProps> = ({
                           strokeWidth={2}
                           dot={false}
                         />
-                        
+
                         <ReferenceLine y={0} stroke={textColor} strokeDasharray="2 2" />
                       </ComposedChart>
                     </ResponsiveContainer>
@@ -383,7 +381,7 @@ export const PortfolioCharts: React.FC<PortfolioChartsProps> = ({
                 <Text fontSize="lg" fontWeight="semibold">
                   Risk Metrics
                 </Text>
-                
+
                 <Grid templateColumns="repeat(2, 1fr)" gap={4} flex={1}>
                   <VStack spacing={2}>
                     <Text fontSize="sm" color={textColor}>Sharpe Ratio</Text>
@@ -391,21 +389,21 @@ export const PortfolioCharts: React.FC<PortfolioChartsProps> = ({
                       1.24
                     </Text>
                   </VStack>
-                  
+
                   <VStack spacing={2}>
                     <Text fontSize="sm" color={textColor}>Max Drawdown</Text>
                     <Text fontSize="2xl" fontWeight="bold" color={colors[3]}>
                       -12.5%
                     </Text>
                   </VStack>
-                  
+
                   <VStack spacing={2}>
                     <Text fontSize="sm" color={textColor}>Volatility</Text>
                     <Text fontSize="2xl" fontWeight="bold" color={colors[1]}>
                       18.3%
                     </Text>
                   </VStack>
-                  
+
                   <VStack spacing={2}>
                     <Text fontSize="sm" color={textColor}>Beta</Text>
                     <Text fontSize="2xl" fontWeight="bold" color={colors[4]}>
@@ -413,7 +411,7 @@ export const PortfolioCharts: React.FC<PortfolioChartsProps> = ({
                     </Text>
                   </VStack>
                 </Grid>
-                
+
                 <Box flex={1}>
                   <ResponsiveContainer width="100%" height="100%">
                     <LineChart data={performanceData.slice(-30)}>
@@ -443,12 +441,12 @@ function generatePortfolioData(timeRange: string) {
   const days = getTimeRangeDays(timeRange)
   const data = []
   let baseValue = 10000
-  
+
   for (let i = 0; i < days; i++) {
     const date = new Date(Date.now() - (days - i) * 24 * 60 * 60 * 1000)
     const change = (Math.random() - 0.5) * 0.05 // ±2.5% daily change
     baseValue *= (1 + change)
-    
+
     data.push({
       date: date.getTime(),
       totalValue: baseValue,
@@ -458,7 +456,7 @@ function generatePortfolioData(timeRange: string) {
       volatility: Math.abs(change) * 100,
     })
   }
-  
+
   return data
 }
 

@@ -66,9 +66,9 @@ class MonitoringService {
     if (typeof window === 'undefined') return
 
     // Web Vitals monitoring
-    import('web-vitals').then(({ onCLS, onFID, onFCP, onLCP, onTTFB }) => {
+    import('web-vitals').then(({ onCLS, onINP, onFCP, onLCP, onTTFB }) => {
       onCLS(this.sendPerformanceMetric.bind(this))
-      onFID(this.sendPerformanceMetric.bind(this))
+      onINP(this.sendPerformanceMetric.bind(this))
       onFCP(this.sendPerformanceMetric.bind(this))
       onLCP(this.sendPerformanceMetric.bind(this))
       onTTFB(this.sendPerformanceMetric.bind(this))
@@ -328,12 +328,12 @@ export const performanceUtils = {
       const start = performance.now()
       const result = fn(...args)
       const end = performance.now()
-      
+
       monitoring.trackEvent('function_performance', {
         function: name,
         duration: end - start,
       })
-      
+
       return result
     }) as T
   },
@@ -346,12 +346,12 @@ export const performanceUtils = {
       const start = performance.now()
       const result = await fn(...args)
       const end = performance.now()
-      
+
       monitoring.trackEvent('async_function_performance', {
         function: name,
         duration: end - start,
       })
-      
+
       return result
     }) as T
   },

@@ -15,11 +15,11 @@ export const createPortfolioSlice: StateCreator<
   Store,
   [['zustand/immer', never], ['zustand/persist', unknown], ['zustand/subscribeWithSelector', never], ['zustand/devtools', never]],
   [],
-  Pick<Store, 
-    'portfolio' | 
-    'updatePortfolio' | 
-    'addTransaction' | 
-    'updateTransaction' | 
+  Pick<Store,
+    'portfolio' |
+    'updatePortfolio' |
+    'addTransaction' |
+    'updateTransaction' |
     'refreshPortfolio' |
     'getTotalValue' |
     'getTotalValueChange' |
@@ -30,33 +30,33 @@ export const createPortfolioSlice: StateCreator<
 > = (set, get) => ({
   portfolio: defaultPortfolioState,
 
-  updatePortfolio: (portfolio) =>
-    set((state) => {
+  updatePortfolio: (portfolio: Partial<PortfolioState>) =>
+    set((state: Store) => {
       Object.assign(state.portfolio, portfolio)
       state.portfolio.lastUpdated = Date.now()
     }),
 
-  addTransaction: (transaction) =>
-    set((state) => {
+  addTransaction: (transaction: any) =>
+    set((state: Store) => {
       state.portfolio.transactions.unshift(transaction)
-      
+
       // Limit to 100 transactions
       if (state.portfolio.transactions.length > 100) {
         state.portfolio.transactions = state.portfolio.transactions.slice(0, 100)
       }
-      
+
       state.trackEvent('portfolio_transaction_added', {
         type: transaction.type,
         value: transaction.value,
       })
     }),
 
-  updateTransaction: (id, updates) =>
-    set((state) => {
+  updateTransaction: (id: string, updates: any) =>
+    set((state: Store) => {
       const transaction = state.portfolio.transactions.find(t => t.id === id)
       if (transaction) {
         Object.assign(transaction, updates)
-        
+
         state.trackEvent('portfolio_transaction_updated', {
           id,
           status: updates.status,
@@ -65,20 +65,20 @@ export const createPortfolioSlice: StateCreator<
     }),
 
   refreshPortfolio: async () => {
-    set((state) => {
+    set((state: Store) => {
       state.portfolio.isLoading = true
     })
-    
+
     try {
       // Mock portfolio refresh
       await new Promise(resolve => setTimeout(resolve, 1000))
-      
-      set((state) => {
+
+      set((state: Store) => {
         state.portfolio.isLoading = false
         state.portfolio.lastUpdated = Date.now()
       })
     } catch (error) {
-      set((state) => {
+      set((state: Store) => {
         state.portfolio.isLoading = false
       })
       throw error

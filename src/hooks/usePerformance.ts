@@ -1,4 +1,4 @@
-import { useEffect, useCallback, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 // Core Web Vitals monitoring
 export interface WebVitalsMetric {
@@ -21,7 +21,7 @@ export const usePerformanceObserver = () => {
 
     const observer = new PerformanceObserver((list) => {
       const entries = list.getEntries()
-      
+
       entries.forEach((entry) => {
         // Log performance entries for debugging
         if (process.env.NODE_ENV === 'development') {
@@ -47,7 +47,7 @@ export const usePerformanceObserver = () => {
 
   const reportMetric = useCallback((metric: WebVitalsMetric) => {
     setMetrics(prev => [...prev, metric])
-    
+
     // Send to analytics in production
     if (process.env.NODE_ENV === 'production') {
       // Example: send to Google Analytics, Vercel Analytics, etc.
@@ -224,7 +224,7 @@ export const useBundleAnalyzer = () => {
           // This would integrate with webpack-bundle-analyzer or similar
           const response = await fetch('/_next/static/chunks/webpack.js')
           const text = await response.text()
-          
+
           setBundleInfo({
             totalSize: text.length,
             chunks: [
@@ -321,9 +321,9 @@ export const useCriticalResources = () => {
 
     const nonCriticalPromises = [
       // Load analytics scripts
-      import('web-vitals').then(({ onCLS, onFID, onFCP, onLCP, onTTFB }) => {
+      import('web-vitals').then(({ onCLS, onINP, onFCP, onLCP, onTTFB }) => {
         onCLS(console.log)
-        onFID(console.log)
+        onINP(console.log)
         onFCP(console.log)
         onLCP(console.log)
         onTTFB(console.log)

@@ -12,10 +12,10 @@ export const createConnectionSlice: StateCreator<
   Store,
   [['zustand/immer', never], ['zustand/persist', unknown], ['zustand/subscribeWithSelector', never], ['zustand/devtools', never]],
   [],
-  Pick<Store, 
-    'connection' | 
-    'setConnection' | 
-    'disconnect' | 
+  Pick<Store,
+    'connection' |
+    'setConnection' |
+    'disconnect' |
     'switchChain' |
     'isConnected' |
     'getAddress' |
@@ -25,17 +25,17 @@ export const createConnectionSlice: StateCreator<
 > = (set, get) => ({
   connection: defaultConnectionState,
 
-  setConnection: (connection) =>
-    set((state) => {
+  setConnection: (connection: Partial<ConnectionState>) =>
+    set((state: Store) => {
       Object.assign(state.connection, connection)
-      
+
       if (connection.isConnected && connection.address) {
         state.trackEvent('wallet_connected', {
           address: connection.address,
           chainId: connection.chainId,
           connector: connection.connector,
         })
-        
+
         state.addNotification({
           type: 'success',
           title: 'Wallet Connected',
@@ -47,17 +47,17 @@ export const createConnectionSlice: StateCreator<
     }),
 
   disconnect: () =>
-    set((state) => {
+    set((state: Store) => {
       const wasConnected = state.connection.isConnected
-      
+
       state.connection = {
         ...defaultConnectionState,
         supportedChains: state.connection.supportedChains,
       }
-      
+
       if (wasConnected) {
         state.trackEvent('wallet_disconnected')
-        
+
         state.addNotification({
           type: 'info',
           title: 'Wallet Disconnected',
@@ -68,23 +68,23 @@ export const createConnectionSlice: StateCreator<
       }
     }),
 
-  switchChain: async (chainId) => {
-    set((state) => {
+  switchChain: async (chainId: number) => {
+    set((state: Store) => {
       state.connection.pendingChainId = chainId
     })
-    
+
     try {
       // Mock chain switch
       await new Promise(resolve => setTimeout(resolve, 1000))
-      
-      set((state) => {
+
+      set((state: Store) => {
         state.connection.chainId = chainId
         state.connection.pendingChainId = undefined
-        
+
         state.trackEvent('chain_switched', {
           chainId,
         })
-        
+
         state.addNotification({
           type: 'success',
           title: 'Network Switched',
@@ -94,10 +94,10 @@ export const createConnectionSlice: StateCreator<
         })
       })
     } catch (error) {
-      set((state) => {
+      set((state: Store) => {
         state.connection.pendingChainId = undefined
         state.connection.error = error instanceof Error ? error.message : 'Failed to switch chain'
-        
+
         state.addNotification({
           type: 'error',
           title: 'Network Switch Failed',

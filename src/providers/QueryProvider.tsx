@@ -1,9 +1,9 @@
 'use client'
 
-import React, { useState } from 'react'
-import { QueryClient, QueryClientProvider, QueryCache, MutationCache } from '@tanstack/react-query'
+import { useAnalyticsStore, useNotificationStore } from '@/store/advanced/store'
+import { MutationCache, QueryCache, QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
-import { useNotificationStore, useAnalyticsStore } from '@/store/advanced/store'
+import React, { useState } from 'react'
 
 // Enhanced Query Client configuration
 const createQueryClient = () => {
@@ -12,36 +12,36 @@ const createQueryClient = () => {
       queries: {
         // Stale time - how long data is considered fresh
         staleTime: 5 * 60 * 1000, // 5 minutes
-        
+
         // Cache time - how long data stays in cache after component unmounts
-        cacheTime: 10 * 60 * 1000, // 10 minutes
-        
+        gcTime: 10 * 60 * 1000, // 10 minutes
+
         // Retry configuration
         retry: (failureCount, error: any) => {
           // Don't retry on 4xx errors
           if (error?.status >= 400 && error?.status < 500) {
             return false
           }
-          
+
           // Retry up to 3 times for other errors
           return failureCount < 3
         },
-        
+
         // Retry delay with exponential backoff
         retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
-        
+
         // Refetch on window focus
         refetchOnWindowFocus: true,
-        
+
         // Refetch on reconnect
         refetchOnReconnect: true,
-        
+
         // Refetch on mount if data is stale
         refetchOnMount: true,
-        
+
         // Background refetch interval
         refetchInterval: false, // Disabled by default, can be enabled per query
-        
+
         // Network mode
         networkMode: 'online',
       },
@@ -54,18 +54,18 @@ const createQueryClient = () => {
           }
           return false
         },
-        
+
         // Network mode for mutations
         networkMode: 'online',
       },
     },
-    
+
     // Global query cache configuration
     queryCache: new QueryCache({
       onError: (error, query) => {
         // Global error handling
         console.error('Query error:', error, query)
-        
+
         // Track error analytics
         if (typeof window !== 'undefined') {
           const analyticsStore = useAnalyticsStore.getState()
@@ -75,7 +75,7 @@ const createQueryClient = () => {
             error: error instanceof Error ? error.message : 'Unknown error',
           })
         }
-        
+
         // Show notification for critical errors
         if (error instanceof Error && error.message.includes('network')) {
           const notificationStore = useNotificationStore.getState()
@@ -88,13 +88,13 @@ const createQueryClient = () => {
           })
         }
       },
-      
+
       onSuccess: (data, query) => {
         // Global success handling
         if (process.env.NODE_ENV === 'development') {
           console.log('Query success:', query.queryKey, data)
         }
-        
+
         // Track successful queries
         if (typeof window !== 'undefined') {
           const analyticsStore = useAnalyticsStore.getState()
@@ -105,13 +105,13 @@ const createQueryClient = () => {
         }
       },
     }),
-    
+
     // Global mutation cache configuration
     mutationCache: new MutationCache({
       onError: (error, variables, context, mutation) => {
         // Global mutation error handling
         console.error('Mutation error:', error, mutation)
-        
+
         // Track error analytics
         if (typeof window !== 'undefined') {
           const analyticsStore = useAnalyticsStore.getState()
@@ -121,7 +121,7 @@ const createQueryClient = () => {
             error: error instanceof Error ? error.message : 'Unknown error',
           })
         }
-        
+
         // Show error notification
         const notificationStore = useNotificationStore.getState()
         notificationStore.addNotification({
@@ -132,13 +132,13 @@ const createQueryClient = () => {
           persistent: false,
         })
       },
-      
+
       onSuccess: (data, variables, context, mutation) => {
         // Global mutation success handling
         if (process.env.NODE_ENV === 'development') {
           console.log('Mutation success:', mutation.options.mutationKey, data)
         }
-        
+
         // Track successful mutations
         if (typeof window !== 'undefined') {
           const analyticsStore = useAnalyticsStore.getState()
@@ -158,11 +158,11 @@ interface QueryProviderProps {
 export const QueryProvider: React.FC<QueryProviderProps> = ({ children }) => {
   // Create query client with stable reference
   const [queryClient] = useState(() => createQueryClient())
-  
+
   return (
     <QueryClientProvider client={queryClient}>
       {children}
-      
+
       {/* Development tools */}
       {process.env.NODE_ENV === 'development' && (
         <ReactQueryDevtools
@@ -192,30 +192,30 @@ export const queryClientUtils = {
       staleTime: 5 * 60 * 1000,
     })
   },
-  
+
   // Invalidate queries by pattern
   invalidateQueriesByPattern: (pattern: string) => {
     const queryClient = new QueryClient()
     queryClient.invalidateQueries({
       predicate: (query) => {
-        return query.queryKey.some(key => 
+        return query.queryKey.some(key =>
           typeof key === 'string' && key.includes(pattern)
         )
       },
     })
   },
-  
+
   // Clear all cache
   clearAllCache: () => {
     const queryClient = new QueryClient()
     queryClient.clear()
   },
-  
+
   // Get cache stats
   getCacheStats: () => {
     const queryClient = new QueryClient()
     const cache = queryClient.getQueryCache()
-    
+
     return {
       totalQueries: cache.getAll().length,
       activeQueries: cache.getAll().filter(query => query.getObserversCount() > 0).length,
@@ -229,21 +229,21 @@ export const queryClientUtils = {
 if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
   // Monitor query performance
   let queryCount = 0
-  let mutationCount = 0
-  
+  const mutationCount = 0
+
   const originalFetch = window.fetch
   window.fetch = async (...args) => {
     const startTime = Date.now()
-    
+
     try {
       const response = await originalFetch(...args)
       const duration = Date.now() - startTime
-      
+
       if (args[0]?.toString().includes('api')) {
         queryCount++
         console.log(`Query #${queryCount} took ${duration}ms:`, args[0])
       }
-      
+
       return response
     } catch (error) {
       const duration = Date.now() - startTime
@@ -251,7 +251,7 @@ if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
       throw error
     }
   }
-  
+
   // Log cache statistics periodically
   setInterval(() => {
     const stats = queryClientUtils.getCacheStats()

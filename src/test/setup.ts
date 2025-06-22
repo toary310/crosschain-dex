@@ -1,9 +1,5 @@
 import '@testing-library/jest-dom'
-import { setupTests } from './utils/testUtils'
 import { vi } from 'vitest'
-
-// Global test setup
-setupTests()
 
 // Mock environment variables
 process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID = 'test-project-id'
@@ -33,6 +29,40 @@ global.WebSocket = vi.fn().mockImplementation(() => ({
   addEventListener: vi.fn(),
   removeEventListener: vi.fn(),
   readyState: 1, // OPEN
+}))
+
+// Mock wagmi hooks
+vi.mock('wagmi', () => ({
+  useAccount: () => ({
+    address: undefined,
+    isConnected: false,
+    isConnecting: false,
+    isDisconnected: true,
+  }),
+  useBalance: () => ({
+    data: undefined,
+    isLoading: false,
+    error: null,
+  }),
+  useChainId: () => 1,
+  useConnect: () => ({
+    connect: vi.fn(),
+    connectors: [],
+    isLoading: false,
+    error: null,
+  }),
+  useDisconnect: () => ({
+    disconnect: vi.fn(),
+  }),
+  WagmiProvider: ({ children }: { children: React.ReactNode }) => children,
+}))
+
+// Mock RainbowKit
+vi.mock('@rainbow-me/rainbowkit', () => ({
+  ConnectButton: () => 'Connect Wallet',
+  RainbowKitProvider: ({ children }: { children: any }) => children,
+  lightTheme: () => ({}),
+  darkTheme: () => ({}),
 }))
 
 // Suppress console warnings in tests

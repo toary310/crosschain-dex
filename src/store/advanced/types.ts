@@ -1,6 +1,7 @@
 // Advanced Store Types for ChainBridge DEX
 import { Token } from '@/config/tokens'
 import { Address } from 'viem'
+import { StateCreator } from 'zustand'
 
 // Base store slice interface
 export interface StoreSlice<T> {
@@ -129,21 +130,24 @@ export interface MarketState {
   lastUpdated: number
 }
 
+// Notification types
+export interface Notification {
+  id: string
+  type: 'success' | 'error' | 'warning' | 'info'
+  title: string
+  message: string
+  timestamp: number
+  read: boolean
+  persistent: boolean
+  actions?: Array<{
+    label: string
+    action: () => void
+  }>
+}
+
 // Notification state
 export interface NotificationState {
-  notifications: Array<{
-    id: string
-    type: 'success' | 'error' | 'warning' | 'info'
-    title: string
-    message: string
-    timestamp: number
-    read: boolean
-    persistent: boolean
-    actions?: Array<{
-      label: string
-      action: () => void
-    }>
-  }>
+  notifications: Notification[]
   unreadCount: number
   settings: {
     enabled: boolean
@@ -233,7 +237,7 @@ export interface StoreActions {
   // User actions
   updateUserPreferences: (preferences: Partial<UserPreferences>) => void
   resetUserPreferences: () => void
-  
+
   // Trading actions
   setFromToken: (token: Token) => void
   setToToken: (token: Token) => void
@@ -245,18 +249,18 @@ export interface StoreActions {
   setDeadline: (deadline: number) => void
   toggleExpertMode: () => void
   resetTradingState: () => void
-  
+
   // Portfolio actions
   updatePortfolio: (portfolio: Partial<PortfolioState>) => void
   addTransaction: (transaction: PortfolioState['transactions'][0]) => void
   updateTransaction: (id: string, updates: Partial<PortfolioState['transactions'][0]>) => void
   refreshPortfolio: () => Promise<void>
-  
+
   // Market actions
   updatePrices: (prices: MarketState['prices']) => void
   updateTrending: (trending: MarketState['trending']) => void
   refreshMarketData: () => Promise<void>
-  
+
   // Notification actions
   addNotification: (notification: Omit<NotificationState['notifications'][0], 'id' | 'timestamp'>) => void
   removeNotification: (id: string) => void
@@ -264,18 +268,18 @@ export interface StoreActions {
   markAllAsRead: () => void
   clearNotifications: () => void
   updateNotificationSettings: (settings: Partial<NotificationState['settings']>) => void
-  
+
   // Connection actions
   setConnection: (connection: Partial<ConnectionState>) => void
   disconnect: () => void
   switchChain: (chainId: number) => Promise<void>
-  
+
   // Analytics actions
   trackPageView: (page: string) => void
   trackEvent: (name: string, properties?: Record<string, any>) => void
   trackError: (error: Error) => void
   updatePerformance: (metrics: Partial<AnalyticsState['performance']>) => void
-  
+
   // Cache actions
   setQueryData: (key: string, data: any, ttl?: number) => void
   getQueryData: (key: string) => any
@@ -290,42 +294,57 @@ export interface StoreSelectors {
   getTheme: () => UserPreferences['theme']
   getLanguage: () => UserPreferences['language']
   getSlippageTolerance: () => number
-  
+
   // Trading selectors
   getTradingPair: () => { from?: Token; to?: Token }
   getTradeAmounts: () => { from: string; to: string }
   getLastQuote: () => TradingState['lastQuote']
   canTrade: () => boolean
-  
+
   // Portfolio selectors
   getTotalValue: () => string
   getTotalValueChange: () => number
   getTokenBalances: () => PortfolioState['tokens']
   getActivePositions: () => PortfolioState['positions']
   getPendingTransactions: () => PortfolioState['transactions']
-  
+
   // Market selectors
   getTokenPrice: (address: string) => number | undefined
   getTrendingTokens: () => MarketState['trending']
   getTopGainers: () => MarketState['topGainers']
   getTopLosers: () => MarketState['topLosers']
-  
+
   // Notification selectors
   getUnreadNotifications: () => NotificationState['notifications']
   getUnreadCount: () => number
-  
+
   // Connection selectors
   isConnected: () => boolean
   getAddress: () => Address | undefined
   getChainId: () => number | undefined
   getBalance: () => string | undefined
-  
+
   // Analytics selectors
   getPageViews: () => Record<string, number>
   getRecentEvents: () => AnalyticsState['events']
   getPerformanceMetrics: () => AnalyticsState['performance']
-  
+
   // Cache selectors
   isQueryStale: (key: string) => boolean
   getQueryStatus: (key: string) => 'fresh' | 'stale' | 'missing'
 }
+
+// Combined store interface
+export interface Store extends RootState, StoreActions, StoreSelectors {
+  getState: () => Store
+  setState: (partial: Partial<Store> | ((state: Store) => Partial<Store>)) => void
+  subscribe: (listener: (state: Store, prevState: Store) => void) => () => void
+}
+
+// Store slice creator type
+export type StoreSliceCreator<T> = StateCreator<
+  Store,
+  [],
+  [],
+  T
+>

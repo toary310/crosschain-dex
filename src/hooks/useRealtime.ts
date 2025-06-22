@@ -1,7 +1,7 @@
-import { useEffect, useRef, useState, useCallback } from 'react'
-import { PriceStreamService, PriceUpdate } from '@/services/realtime/PriceStreamService'
 import { NotificationService } from '@/services/realtime/NotificationService'
-import { useMarketStore, useConnectionStore, useNotificationStore } from '@/store/advanced/store'
+import { PriceStreamService, PriceUpdate } from '@/services/realtime/PriceStreamService'
+import { useConnectionStore, useMarketStore, useNotificationStore } from '@/store/advanced/store'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 // Price streaming hook
 export const usePriceStream = (symbols: string[] = []) => {
@@ -25,7 +25,7 @@ export const usePriceStream = (symbols: string[] = []) => {
         // Subscribe to all price updates
         const unsubscribe = serviceRef.current.subscribeToSymbol('*', (update) => {
           setPrices(prev => new Map(prev.set(update.symbol, update)))
-          
+
           // Update global store
           updatePrices({
             [update.address]: {
@@ -252,64 +252,71 @@ export const useRealtimeSync = <T>(
     onError,
   } = options
 
+  // Memoize callbacks to prevent unnecessary re-renders
+  const memoizedOnUpdate = useCallback((data: T) => {
+    onUpdate?.(data)
+  }, [onUpdate])
+
+  const memoizedOnError = useCallback((error: Error) => {
+    onError?.(error)
+  }, [onError])
+
   const fetchData = useCallback(async () => {
     if (!enabled) return
 
-    setIsLoading(true)
-    setError(null)
-
     try {
+      setIsLoading(true)
+      setError(null)
+
       const result = await fetcher()
       setData(result)
       setLastUpdated(Date.now())
-      onUpdate?.(result)
+
+      memoizedOnUpdate(result)
     } catch (err) {
-      const error = err instanceof Error ? err : new Error('Fetch failed')
+      const error = err instanceof Error ? err : new Error('Unknown error')
       setError(error)
-      onError?.(error)
+      memoizedOnError(error)
     } finally {
       setIsLoading(false)
     }
-  }, [fetcher, enabled, onUpdate, onError])
+  }, [enabled, fetcher, memoizedOnUpdate, memoizedOnError])
 
-  const startSync = useCallback(() => {
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current)
-    }
+  // Setup interval
+  useEffect(() => {
+    if (!enabled) return
 
-    fetchData() // Initial fetch
+    // Initial fetch
+    fetchData()
+
+    // Setup interval
     intervalRef.current = setInterval(fetchData, interval)
-  }, [fetchData, interval])
 
-  const stopSync = useCallback(() => {
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current)
-      intervalRef.current = null
+    // Cleanup function
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current)
+        intervalRef.current = null
+      }
+    }
+  }, [enabled, interval, fetchData])
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current)
+        intervalRef.current = null
+      }
     }
   }, [])
-
-  useEffect(() => {
-    if (enabled) {
-      startSync()
-    } else {
-      stopSync()
-    }
-
-    return stopSync
-  }, [enabled, startSync, stopSync])
-
-  const refresh = useCallback(() => {
-    fetchData()
-  }, [fetchData])
 
   return {
     data,
     isLoading,
     error,
     lastUpdated,
-    refresh,
-    startSync,
-    stopSync,
+    refetch: fetchData,
   }
 }
 
@@ -331,25 +338,25 @@ export const useLiveChartData = (symbol: string, interval: string = '1m') => {
       wsRef.current.onmessage = (event) => {
         try {
           const data = JSON.parse(event.data)
-          
+
           if (data.type === 'kline') {
             setChartData(prev => {
               const newData = [...prev]
               const lastIndex = newData.length - 1
-              
+
               if (lastIndex >= 0 && newData[lastIndex].timestamp === data.timestamp) {
                 // Update existing candle
                 newData[lastIndex] = data
               } else {
                 // Add new candle
                 newData.push(data)
-                
+
                 // Keep only last 1000 candles
                 if (newData.length > 1000) {
                   newData.shift()
                 }
               }
-              
+
               return newData
             })
           }

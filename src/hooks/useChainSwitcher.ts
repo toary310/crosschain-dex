@@ -12,11 +12,19 @@ export function useChainSwitcher() {
 
   const handleChainSwitch = useCallback((newChainId: string) => {
     const chainIdNumber = parseInt(newChainId)
-    switchChain({ chainId: chainIdNumber as any })
+    if (isNaN(chainIdNumber)) {
+      console.error('Invalid chain ID:', newChainId)
+      return
+    }
+    switchChain({ chainId: chainIdNumber })
   }, [switchChain])
 
   const switchToChain = useCallback((chainId: number) => {
-    switchChain({ chainId: chainId as any })
+    if (!chainId || chainId <= 0) {
+      console.error('Invalid chain ID:', chainId)
+      return
+    }
+    switchChain({ chainId })
   }, [switchChain])
 
   return {

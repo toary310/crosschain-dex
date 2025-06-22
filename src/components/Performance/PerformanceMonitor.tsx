@@ -1,34 +1,32 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
 import {
-  Box,
-  VStack,
-  HStack,
-  Text,
-  Badge,
-  Progress,
-  Collapse,
-  IconButton,
-  useDisclosure,
-  useColorModeValue,
-  Tooltip,
-  Grid,
-  GridItem,
-  Stat,
-  StatLabel,
-  StatNumber,
-  StatHelpText,
-  StatArrow,
-} from '@chakra-ui/react'
-import { FiActivity, FiEye, FiEyeOff, FiRefreshCw } from 'react-icons/fi'
-import { motion, AnimatePresence } from 'framer-motion'
-import {
-  usePerformanceObserver,
-  useMemoryMonitor,
-  usePerformanceBudget,
-  WebVitalsMetric,
+    useMemoryMonitor,
+    usePerformanceBudget,
+    usePerformanceObserver,
+    WebVitalsMetric,
 } from '@/hooks/usePerformance'
+import {
+    Badge,
+    Box,
+    Grid,
+    GridItem,
+    HStack,
+    IconButton,
+    Progress,
+    Stat,
+    StatHelpText,
+    StatLabel,
+    StatNumber,
+    Text,
+    Tooltip,
+    useColorModeValue,
+    useDisclosure,
+    VStack
+} from '@chakra-ui/react'
+import { AnimatePresence, motion } from 'framer-motion'
+import React, { useEffect, useState } from 'react'
+import { FiActivity, FiEyeOff, FiRefreshCw } from 'react-icons/fi'
 
 const MotionBox = motion(Box)
 
@@ -70,8 +68,7 @@ export const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({
   useEffect(() => {
     const loadWebVitals = async () => {
       try {
-        const { onCLS, onFID, onFCP, onLCP, onTTFB } = await import('web-vitals')
-        
+        const { onCLS, onINP, onFCP, onLCP, onTTFB } = await import('web-vitals')
         const handleMetric = (metric: any) => {
           const webVitalMetric: WebVitalsMetric = {
             name: metric.name,
@@ -80,7 +77,7 @@ export const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({
             delta: metric.delta,
             id: metric.id,
           }
-          
+
           setWebVitals(prev => {
             const existing = prev.findIndex(m => m.name === metric.name)
             if (existing >= 0) {
@@ -90,12 +87,12 @@ export const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({
             }
             return [...prev, webVitalMetric]
           })
-          
+
           reportMetric(webVitalMetric)
         }
 
         onCLS(handleMetric)
-        onFID(handleMetric)
+        onINP(handleMetric)
         onFCP(handleMetric)
         onLCP(handleMetric)
         onTTFB(handleMetric)

@@ -1,31 +1,31 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
-import {
-  Box,
-  Container,
-  Flex,
-  VStack,
-  HStack,
-  useBreakpointValue,
-  useColorModeValue,
-  Drawer,
-  DrawerBody,
-  DrawerHeader,
-  DrawerOverlay,
-  DrawerContent,
-  DrawerCloseButton,
-  useDisclosure,
-  IconButton,
-  Text,
-  Divider,
-  Badge,
-} from '@chakra-ui/react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { FiMenu, FiX, FiHome, FiTrendingUp, FiPieChart, FiBarChart3 } from 'react-icons/fi'
 import { useIsMobile, useSafeAreaInsets, useViewportHeight } from '@/hooks/useMobile'
-import { Header } from './Header'
+import {
+    Badge,
+    Box,
+    Container,
+    Divider,
+    Drawer,
+    DrawerBody,
+    DrawerCloseButton,
+    DrawerContent,
+    DrawerHeader,
+    DrawerOverlay,
+    Flex,
+    HStack,
+    IconButton,
+    Text,
+    useBreakpointValue,
+    useColorModeValue,
+    useDisclosure,
+    VStack,
+} from '@chakra-ui/react'
+import { motion } from 'framer-motion'
+import React from 'react'
+import { FiHome, FiMenu, FiPieChart, FiTrendingUp } from 'react-icons/fi'
 import { Footer } from './Footer'
+import { Header } from './Header'
 
 const MotionBox = motion(Box)
 const MotionFlex = motion(Flex)
@@ -80,10 +80,10 @@ export const ResponsiveLayout: React.FC<ResponsiveLayoutProps> = ({
     },
   }
 
-  const currentConfig = isMobile 
-    ? layoutConfig.mobile 
-    : isTablet 
-    ? layoutConfig.tablet 
+  const currentConfig = isMobile
+    ? layoutConfig.mobile
+    : isTablet
+    ? layoutConfig.tablet
     : layoutConfig.desktop
 
   // Mobile navigation items
@@ -91,7 +91,7 @@ export const ResponsiveLayout: React.FC<ResponsiveLayoutProps> = ({
     { icon: FiHome, label: 'Home', href: '/', badge: null },
     { icon: FiTrendingUp, label: 'Swap', href: '/swap', badge: null },
     { icon: FiPieChart, label: 'Pools', href: '/pools', badge: 'New' },
-    { icon: FiBarChart3, label: 'Portfolio', href: '/portfolio', badge: '3' },
+    { icon: FiBarChart, label: 'Portfolio', href: '/portfolio', badge: '3' },
   ]
 
   // Sidebar component
