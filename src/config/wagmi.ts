@@ -17,11 +17,23 @@ export const config = createConfig({
     ...(projectId && typeof window !== 'undefined' ? [walletConnect({ projectId })] : []),
   ],
   transports: {
-    [mainnet.id]: http(),
-    [polygon.id]: http(),
-    [arbitrum.id]: http(),
-    [optimism.id]: http(),
-    [avalanche.id]: http(),
+    [mainnet.id]: http(process.env.NEXT_PUBLIC_ALCHEMY_API_KEY
+      ? `https://eth-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_API_KEY}`
+      : 'https://eth.llamarpc.com'
+    ),
+    [polygon.id]: http(process.env.NEXT_PUBLIC_ALCHEMY_API_KEY
+      ? `https://polygon-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_API_KEY}`
+      : 'https://polygon.llamarpc.com'
+    ),
+    [arbitrum.id]: http(process.env.NEXT_PUBLIC_ALCHEMY_API_KEY
+      ? `https://arb-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_API_KEY}`
+      : 'https://arbitrum.llamarpc.com'
+    ),
+    [optimism.id]: http(process.env.NEXT_PUBLIC_ALCHEMY_API_KEY
+      ? `https://opt-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_API_KEY}`
+      : 'https://optimism.llamarpc.com'
+    ),
+    [avalanche.id]: http('https://api.avax.network/ext/bc/C/rpc'),
   },
 })
 

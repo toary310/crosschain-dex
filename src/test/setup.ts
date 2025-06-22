@@ -1,4 +1,58 @@
 import '@testing-library/jest-dom'
+import { setupTests } from './utils/testUtils'
+import { vi } from 'vitest'
+
+// Global test setup
+setupTests()
+
+// Mock environment variables
+process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID = 'test-project-id'
+process.env.NEXT_PUBLIC_ALCHEMY_API_KEY = 'test-alchemy-key'
+process.env.NEXT_PUBLIC_1INCH_API_KEY = 'test-1inch-key'
+process.env.NEXT_PUBLIC_ENVIRONMENT = 'test'
+
+// Mock Web3 APIs
+global.fetch = vi.fn()
+
+// Mock crypto.getRandomValues for testing
+Object.defineProperty(global, 'crypto', {
+  value: {
+    getRandomValues: (arr: any) => {
+      for (let i = 0; i < arr.length; i++) {
+        arr[i] = Math.floor(Math.random() * 256)
+      }
+      return arr
+    },
+  },
+})
+
+// Mock WebSocket for real-time features
+global.WebSocket = vi.fn().mockImplementation(() => ({
+  close: vi.fn(),
+  send: vi.fn(),
+  addEventListener: vi.fn(),
+  removeEventListener: vi.fn(),
+  readyState: 1, // OPEN
+}))
+
+// Suppress console warnings in tests
+const originalWarn = console.warn
+const originalError = console.error
+
+beforeAll(() => {
+  console.warn = vi.fn()
+  console.error = vi.fn()
+})
+
+afterAll(() => {
+  console.warn = originalWarn
+  console.error = originalError
+})
+
+// Clean up after each test
+afterEach(() => {
+  vi.clearAllMocks()
+})
 
 // Mock IntersectionObserver
 global.IntersectionObserver = class IntersectionObserver {

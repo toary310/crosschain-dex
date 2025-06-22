@@ -3,15 +3,6 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   // Performance optimizations
   experimental: {
-    // Enable Turbopack for faster builds
-    turbo: {
-      rules: {
-        '*.svg': {
-          loaders: ['@svgr/webpack'],
-          as: '*.js',
-        },
-      },
-    },
     // Enable optimized package imports
     optimizePackageImports: [
       '@chakra-ui/react',
@@ -21,11 +12,27 @@ const nextConfig: NextConfig = {
       'recharts',
       'viem',
       'wagmi',
+      '@tanstack/react-query',
+      'zustand',
+      'immer',
     ],
-    // Enable server components optimization
-    serverComponentsExternalPackages: ['sharp'],
     // Enable memory optimization
     memoryBasedWorkersCount: true,
+    // Enable CSS optimization
+    optimizeCss: true,
+  },
+
+  // Server external packages
+  serverExternalPackages: ['sharp', 'canvas'],
+
+  // Turbopack configuration
+  turbopack: {
+    rules: {
+      '*.svg': {
+        loaders: ['@svgr/webpack'],
+        as: '*.js',
+      },
+    },
   },
 
   // Compiler optimizations
@@ -55,12 +62,57 @@ const nextConfig: NextConfig = {
   },
 
   // Bundle optimization
-  webpack: (config, { dev, isServer }) => {
+  webpack: (config, { dev, isServer, webpack }) => {
     // Optimize bundle splitting
     if (!dev && !isServer) {
       config.optimization.splitChunks = {
         chunks: 'all',
+        minSize: 20000,
+        maxSize: 244000,
         cacheGroups: {
+          // Framework chunk (React, Next.js)
+          framework: {
+            test: /[\\/]node_modules[\\/](react|react-dom|next)[\\/]/,
+            name: 'framework',
+            priority: 40,
+            enforce: true,
+            reuseExistingChunk: true,
+          },
+          // Chakra UI chunk
+          chakra: {
+            test: /[\\/]node_modules[\\/]@chakra-ui[\\/]/,
+            name: 'chakra',
+            priority: 30,
+            reuseExistingChunk: true,
+          },
+          // Web3 libraries chunk
+          web3: {
+            test: /[\\/]node_modules[\\/](viem|wagmi|@wagmi|@rainbow-me)[\\/]/,
+            name: 'web3',
+            priority: 30,
+            reuseExistingChunk: true,
+          },
+          // Animation libraries chunk
+          animations: {
+            test: /[\\/]node_modules[\\/](framer-motion|motion)[\\/]/,
+            name: 'animations',
+            priority: 25,
+            reuseExistingChunk: true,
+          },
+          // Charts and visualization
+          charts: {
+            test: /[\\/]node_modules[\\/](recharts|d3|chart\.js)[\\/]/,
+            name: 'charts',
+            priority: 25,
+            reuseExistingChunk: true,
+          },
+          // State management
+          state: {
+            test: /[\\/]node_modules[\\/](zustand|@tanstack\/react-query|immer)[\\/]/,
+            name: 'state',
+            priority: 25,
+            reuseExistingChunk: true,
+          },
           // Vendor chunks
           vendor: {
             test: /[\\/]node_modules[\\/]/,
@@ -68,31 +120,10 @@ const nextConfig: NextConfig = {
             priority: 10,
             reuseExistingChunk: true,
           },
-          // Chakra UI chunk
-          chakra: {
-            test: /[\\/]node_modules[\\/]@chakra-ui[\\/]/,
-            name: 'chakra',
-            priority: 20,
-            reuseExistingChunk: true,
-          },
-          // Web3 libraries chunk
-          web3: {
-            test: /[\\/]node_modules[\\/](viem|wagmi|@wagmi)[\\/]/,
-            name: 'web3',
-            priority: 20,
-            reuseExistingChunk: true,
-          },
-          // Animation libraries chunk
-          animations: {
-            test: /[\\/]node_modules[\\/](framer-motion|motion)[\\/]/,
-            name: 'animations',
-            priority: 20,
-            reuseExistingChunk: true,
-          },
-          // Charts chunk
-          charts: {
-            test: /[\\/]node_modules[\\/](recharts|d3-)[\\/]/,
-            name: 'charts',
+          // Additional charts libraries
+          chartsExtended: {
+            test: /[\\/]node_modules[\\/](d3-|plotly\.js)[\\/]/,
+            name: 'charts-extended',
             priority: 20,
             reuseExistingChunk: true,
           },
@@ -179,8 +210,7 @@ const nextConfig: NextConfig = {
   // Enable React strict mode
   reactStrictMode: true,
 
-  // Enable SWC minification
-  swcMinify: true,
+  // SWC minification is enabled by default in Next.js 15
 
   // Output configuration
   output: 'standalone',

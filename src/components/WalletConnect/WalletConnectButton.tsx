@@ -62,18 +62,25 @@ export function WalletConnectButton() {
 
   return (
     <Menu>
-      <MenuButton as={Button}>
+      <MenuButton as={Button} colorScheme="blue" rightIcon={<Text>▼</Text>}>
         Connect Wallet
       </MenuButton>
       <MenuList>
-        {connectors.map((connector) => (
-          <MenuItem
-            key={connector.id}
-            onClick={() => handleConnect(connector)}
-          >
-            {connector.name}
+        {connectors.length > 0 ? (
+          connectors.map((connector) => (
+            <MenuItem
+              key={connector.id}
+              onClick={() => handleConnect(connector)}
+              icon={<Text>🔗</Text>}
+            >
+              {connector.name}
+            </MenuItem>
+          ))
+        ) : (
+          <MenuItem isDisabled>
+            No wallets available
           </MenuItem>
-        ))}
+        )}
       </MenuList>
     </Menu>
   )

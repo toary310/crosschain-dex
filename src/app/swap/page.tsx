@@ -1,8 +1,10 @@
 'use client'
 
 import { MainLayout } from '@/components/Layout/MainLayout'
+import { TokenSelector } from '@/components/Swap/TokenSelector'
 import { useSwapStore } from '@/store/useSwapStore'
 import { useUIStore } from '@/store/useUIStore'
+import { Token } from '@/config/tokens'
 import {
     Box,
     Button,
@@ -13,17 +15,17 @@ import {
     HStack,
     IconButton,
     Input,
-    Select,
     Text,
     useColorModeValue,
     useToast,
     VStack
 } from '@chakra-ui/react'
 import { useEffect } from 'react'
-import { useAccount } from 'wagmi'
+import { useAccount, useChainId } from 'wagmi'
 
 export default function SwapPage() {
-  const { isConnected } = useAccount()
+  const { isConnected, address } = useAccount()
+  const chainId = useChainId()
   const { setActiveTab } = useUIStore()
   const toast = useToast()
   const {
@@ -33,6 +35,8 @@ export default function SwapPage() {
     toAmount,
     slippageTolerance,
     isLoading,
+    setFromToken,
+    setToToken,
     setFromAmount,
     setToAmount,
     setSlippageTolerance,
@@ -93,11 +97,15 @@ export default function SwapPage() {
                   From
                 </Text>
                 <HStack spacing={2}>
-                  <Select placeholder="Select token" flex={1}>
-                    <option value="ETH">ETH - Ethereum</option>
-                    <option value="USDC">USDC - USD Coin</option>
-                    <option value="DAI">DAI - Dai Stablecoin</option>
-                  </Select>
+                  <TokenSelector
+                    selectedToken={fromToken || undefined}
+                    onTokenSelect={(token: Token) => setFromToken(token)}
+                    chainId={chainId}
+                    excludeToken={toToken || undefined}
+                    label="Select token"
+                    showBalance={true}
+                    userAddress={address}
+                  />
                   <Input
                     placeholder="0.0"
                     value={fromAmount}
@@ -124,11 +132,15 @@ export default function SwapPage() {
                   To
                 </Text>
                 <HStack spacing={2}>
-                  <Select placeholder="Select token" flex={1}>
-                    <option value="USDC">USDC - USD Coin</option>
-                    <option value="DAI">DAI - Dai Stablecoin</option>
-                    <option value="ETH">ETH - Ethereum</option>
-                  </Select>
+                  <TokenSelector
+                    selectedToken={toToken || undefined}
+                    onTokenSelect={(token: Token) => setToToken(token)}
+                    chainId={chainId}
+                    excludeToken={fromToken || undefined}
+                    label="Select token"
+                    showBalance={false}
+                    userAddress={address}
+                  />
                   <Input
                     placeholder="0.0"
                     value={toAmount}

@@ -70,7 +70,7 @@ export const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({
   useEffect(() => {
     const loadWebVitals = async () => {
       try {
-        const { getCLS, getFID, getFCP, getLCP, getTTFB } = await import('web-vitals')
+        const { onCLS, onFID, onFCP, onLCP, onTTFB } = await import('web-vitals')
         
         const handleMetric = (metric: any) => {
           const webVitalMetric: WebVitalsMetric = {
@@ -94,11 +94,11 @@ export const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({
           reportMetric(webVitalMetric)
         }
 
-        getCLS(handleMetric)
-        getFID(handleMetric)
-        getFCP(handleMetric)
-        getLCP(handleMetric)
-        getTTFB(handleMetric)
+        onCLS(handleMetric)
+        onFID(handleMetric)
+        onFCP(handleMetric)
+        onLCP(handleMetric)
+        onTTFB(handleMetric)
       } catch (error) {
         console.warn('Failed to load Web Vitals:', error)
       }
