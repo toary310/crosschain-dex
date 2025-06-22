@@ -2,17 +2,17 @@ import { Token } from '@/config/tokens'
 import { BaseBridgeService } from './baseBridgeService'
 import { LayerZeroService } from './layerZeroService'
 import {
-  BridgeProtocol,
-  BridgeRequest,
-  BridgeResponse,
-  BridgeQuote,
-  BridgeTransaction,
-  BridgeParams,
-  BridgeStatus,
-  RouteOptimization,
-  OptimizedRoute,
-  BridgeApiResponse,
-  BridgeError
+    BridgeApiResponse,
+    BridgeError,
+    BridgeParams,
+    BridgeProtocol,
+    BridgeQuote,
+    BridgeRequest,
+    BridgeResponse,
+    BridgeStatus,
+    BridgeTransaction,
+    OptimizedRoute,
+    RouteOptimization
 } from './types'
 
 export interface BridgeAggregatorConfig {
@@ -86,7 +86,7 @@ export class BridgeAggregator {
 
       // Get quotes from all services
       const quotes = await this.getAllQuotes(request)
-      
+
       if (quotes.length === 0) {
         return {
           quotes: [],
@@ -98,7 +98,7 @@ export class BridgeAggregator {
 
       // Optimize and select best quote
       const optimizedQuotes = this.optimizeRoutes(quotes, optimization || this.config.defaultOptimization)
-      const bestQuote = optimizedQuotes[0]?.quote || quotes[0]
+      const bestQuote = quotes[0] // Use original quote instead of optimized route
 
       // Cache the best quote
       if (bestQuote) {
@@ -138,7 +138,7 @@ export class BridgeAggregator {
             service.getQuote(request),
             this.timeoutPromise(this.config.quoteTimeout)
           ])
-          
+
           return response.success ? response.data : null
         } catch (error) {
           console.warn(`Bridge quote failed for ${protocol}:`, error)
@@ -148,14 +148,14 @@ export class BridgeAggregator {
 
       const results = await Promise.allSettled(promises)
       return results
-        .filter((result): result is PromiseFulfilledResult<BridgeQuote | null> => 
+        .filter((result): result is PromiseFulfilledResult<BridgeQuote | null> =>
           result.status === 'fulfilled' && result.value !== null
         )
         .map(result => result.value!)
     } else {
       // Sequential execution for rate limit compliance
       const quotes: BridgeQuote[] = []
-      
+
       for (const [protocol, service] of enabledServices) {
         try {
           const response = await service.getQuote(request)
@@ -178,7 +178,7 @@ export class BridgeAggregator {
     const optimizedRoutes: OptimizedRoute[] = quotes.map(quote => {
       const score = this.calculateRouteScore(quote, optimization)
       const reasoning = this.generateReasoning(quote, optimization)
-      
+
       return {
         ...quote.route,
         score,
@@ -260,7 +260,7 @@ export class BridgeAggregator {
    */
   async buildTransaction(params: BridgeParams): Promise<BridgeApiResponse<BridgeTransaction>> {
     const service = this.services.get(params.quote.route.protocol)
-    
+
     if (!service) {
       const error: BridgeError = {
         code: 'UNKNOWN_ERROR',
@@ -338,7 +338,7 @@ export class BridgeAggregator {
     )
 
     const results = await Promise.allSettled(promises)
-    return results.some(result => 
+    return results.some(result =>
       result.status === 'fulfilled' && result.value === true
     )
   }
@@ -446,6 +446,3 @@ export class BridgeAggregator {
 
 // Export singleton instance
 export const bridgeAggregator = new BridgeAggregator()
-
-// Export class for custom instances
-export { BridgeAggregator }

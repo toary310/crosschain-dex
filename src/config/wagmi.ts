@@ -5,7 +5,7 @@ import { injected, metaMask, walletConnect } from 'wagmi/connectors'
 // Get WalletConnect project ID from environment variables
 const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID
 
-if (!projectId) {
+if (!projectId && typeof window !== 'undefined') {
   console.warn('NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID is not set')
 }
 
@@ -14,7 +14,7 @@ export const config = createConfig({
   connectors: [
     injected(),
     metaMask(),
-    ...(projectId ? [walletConnect({ projectId })] : []),
+    ...(projectId && typeof window !== 'undefined' ? [walletConnect({ projectId })] : []),
   ],
   transports: {
     [mainnet.id]: http(),

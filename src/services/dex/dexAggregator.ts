@@ -2,18 +2,16 @@ import { Token } from '@/config/tokens'
 import { BaseDexService } from './baseDexService'
 import { OneInchService } from './oneInchService'
 import {
-  DexProtocol,
-  QuoteRequest,
-  QuoteResponse,
-  SwapQuote,
-  SwapTransaction,
-  SwapParams,
-  QuoteFilters,
-  QuoteSorting,
-  SortBy,
-  SortOrder,
-  ApiResponse,
-  DexError
+    ApiResponse,
+    DexError,
+    DexProtocol,
+    QuoteFilters,
+    QuoteRequest,
+    QuoteResponse,
+    QuoteSorting,
+    SwapParams,
+    SwapQuote,
+    SwapTransaction
 } from './types'
 
 export interface AggregatorConfig {
@@ -86,7 +84,7 @@ export class DexAggregator {
 
       // Get quotes from all services
       const quotes = await this.getAllQuotes(request)
-      
+
       if (quotes.length === 0) {
         return {
           quotes: [],
@@ -98,7 +96,7 @@ export class DexAggregator {
 
       // Find best quote
       const bestQuote = this.selectBestQuote(quotes)
-      
+
       // Cache the best quote
       if (bestQuote) {
         this.setCache(cacheKey, bestQuote)
@@ -136,7 +134,7 @@ export class DexAggregator {
             service.getQuote(request),
             this.timeoutPromise(this.config.quoteTimeout)
           ])
-          
+
           return response.success ? response.data : null
         } catch (error) {
           console.warn(`Quote failed for ${protocol}:`, error)
@@ -146,14 +144,14 @@ export class DexAggregator {
 
       const results = await Promise.allSettled(promises)
       return results
-        .filter((result): result is PromiseFulfilledResult<SwapQuote | null> => 
+        .filter((result): result is PromiseFulfilledResult<SwapQuote | null> =>
           result.status === 'fulfilled' && result.value !== null
         )
         .map(result => result.value!)
     } else {
       // Sequential execution for rate limit compliance
       const quotes: SwapQuote[] = []
-      
+
       for (const [protocol, service] of enabledServices) {
         try {
           const response = await service.getQuote(request)
@@ -177,13 +175,13 @@ export class DexAggregator {
     if (quotes.length === 1) return quotes[0]
 
     // Filter quotes by price impact threshold
-    const validQuotes = quotes.filter(quote => 
+    const validQuotes = quotes.filter(quote =>
       quote.priceImpact <= this.config.priceImpactThreshold
     )
 
     if (validQuotes.length === 0) {
       // If all quotes exceed threshold, return the one with lowest impact
-      return quotes.reduce((best, current) => 
+      return quotes.reduce((best, current) =>
         current.priceImpact < best.priceImpact ? current : best
       )
     }
@@ -195,7 +193,7 @@ export class DexAggregator {
     }))
 
     // Return quote with highest score
-    return scoredQuotes.reduce((best, current) => 
+    return scoredQuotes.reduce((best, current) =>
       current.score > best.score ? current : best
     ).quote
   }
@@ -291,7 +289,7 @@ export class DexAggregator {
    */
   async buildTransaction(params: SwapParams): Promise<ApiResponse<SwapTransaction>> {
     const service = this.services.get(params.quote.protocol)
-    
+
     if (!service) {
       const error: DexError = {
         code: 'UNKNOWN_ERROR',
@@ -317,7 +315,7 @@ export class DexAggregator {
     )
 
     const results = await Promise.allSettled(promises)
-    return results.some(result => 
+    return results.some(result =>
       result.status === 'fulfilled' && result.value === true
     )
   }
@@ -384,6 +382,3 @@ export class DexAggregator {
 
 // Export singleton instance
 export const dexAggregator = new DexAggregator()
-
-// Export class for custom instances
-export { DexAggregator }

@@ -1,12 +1,12 @@
-import { Address, Hash } from 'viem'
 import { Token } from '@/config/tokens'
 import { Transaction } from '@/services/transaction/types'
+import { Address } from 'viem'
 
 // Security Risk Levels
 export type SecurityRiskLevel = 'low' | 'medium' | 'high' | 'critical'
 
 // Security Check Types
-export type SecurityCheckType = 
+export type SecurityCheckType =
   | 'contract_verification'
   | 'token_validation'
   | 'amount_validation'
@@ -270,7 +270,7 @@ export class SecurityValidator {
     try {
       // Check cache first
       let contractInfo = this.contractCache.get(address)
-      
+
       if (!contractInfo) {
         contractInfo = await this.fetchContractInfo(address)
         this.contractCache.set(address, contractInfo)
@@ -315,7 +315,7 @@ export class SecurityValidator {
     try {
       // Check cache first
       let tokenInfo = this.tokenCache.get(token.address)
-      
+
       if (!tokenInfo) {
         tokenInfo = await this.fetchTokenInfo(token)
         this.tokenCache.set(token.address, tokenInfo)
@@ -614,7 +614,7 @@ export class SecurityValidator {
         transferTax: 0,
       },
       holders: 1000,
-      riskLevel: token.riskLevel || 'medium',
+      riskLevel: (token.riskLevel === 'unverified' ? 'high' : token.riskLevel) || 'medium',
       warnings: [],
     }
   }
@@ -630,7 +630,7 @@ export class SecurityValidator {
     // Simple heuristic - large amounts or high slippage are more vulnerable
     const amount = parseFloat(transaction.fromAmount || '0')
     const slippage = transaction.slippage || 0
-    
+
     return amount > 10000 || slippage > 2
   }
 
@@ -706,6 +706,3 @@ export class SecurityValidator {
 
 // Export singleton instance
 export const securityValidator = new SecurityValidator()
-
-// Export class for custom instances
-export { SecurityValidator }

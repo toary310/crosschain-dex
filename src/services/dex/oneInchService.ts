@@ -1,15 +1,14 @@
-import { Address } from 'viem'
 import { Token } from '@/config/tokens'
+import { Address } from 'viem'
 import { BaseDexService } from './baseDexService'
 import {
-  DexConfig,
-  QuoteRequest,
-  SwapQuote,
-  SwapTransaction,
-  SwapParams,
-  ApiResponse,
-  OneInchQuote,
-  SwapRoute
+    ApiResponse,
+    DexConfig,
+    QuoteRequest,
+    SwapParams,
+    SwapQuote,
+    SwapRoute,
+    SwapTransaction
 } from './types'
 
 interface OneInchConfig extends DexConfig {
@@ -119,11 +118,11 @@ export class OneInchService extends BaseDexService {
 
       return this.createResponse(quote)
     } catch (error) {
-      const dexError = error instanceof Error 
+      const dexError = error instanceof Error
         ? this.createError('API_ERROR', error.message)
         : this.createError('UNKNOWN_ERROR', 'Failed to get quote')
-      
-      return this.createResponse(undefined, dexError)
+
+      return this.createResponse(null as any, dexError)
     }
   }
 
@@ -157,8 +156,8 @@ export class OneInchService extends BaseDexService {
       const dexError = error instanceof Error
         ? this.createError('API_ERROR', error.message)
         : this.createError('UNKNOWN_ERROR', 'Failed to build transaction')
-      
-      return this.createResponse(undefined, dexError)
+
+      return this.createResponse(null as any, dexError)
     }
   }
 
@@ -168,7 +167,7 @@ export class OneInchService extends BaseDexService {
   async getSupportedTokens(chainId: number): Promise<ApiResponse<Token[]>> {
     try {
       const url = `${this.oneInchConfig.baseUrl}/${this.oneInchConfig.version}/${chainId}/tokens`
-      
+
       const response = await this.makeRequest<{ tokens: Record<string, any> }>(url)
       const tokens = Object.values(response.tokens).map(this.parseTokenData)
 
@@ -177,8 +176,8 @@ export class OneInchService extends BaseDexService {
       const dexError = error instanceof Error
         ? this.createError('API_ERROR', error.message)
         : this.createError('UNKNOWN_ERROR', 'Failed to get supported tokens')
-      
-      return this.createResponse(undefined, dexError)
+
+      return this.createResponse([] as any, dexError)
     }
   }
 
@@ -188,16 +187,16 @@ export class OneInchService extends BaseDexService {
   async isPairSupported(fromToken: Token, toToken: Token): Promise<boolean> {
     try {
       const supportedTokensResponse = await this.getSupportedTokens(fromToken.chainId)
-      
+
       if (!supportedTokensResponse.success || !supportedTokensResponse.data) {
         return false
       }
 
       const tokens = supportedTokensResponse.data
-      const fromSupported = tokens.some(t => 
+      const fromSupported = tokens.some(t =>
         t.address.toLowerCase() === fromToken.address.toLowerCase()
       )
-      const toSupported = tokens.some(t => 
+      const toSupported = tokens.some(t =>
         t.address.toLowerCase() === toToken.address.toLowerCase()
       )
 
@@ -276,7 +275,7 @@ export class OneInchService extends BaseDexService {
   private parseQuoteResponse(response: OneInchQuoteResponse, request: QuoteRequest): SwapQuote {
     const toAmount = this.parseAmount(response.toTokenAmount, request.toToken.decimals)
     const toAmountMin = this.calculateMinOutput(toAmount, request.slippage)
-    
+
     // Parse routes from protocols
     const routes: SwapRoute[] = response.protocols.flat().map(protocol => ({
       protocol: this.mapProtocolName(protocol.name),

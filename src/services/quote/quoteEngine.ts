@@ -1,15 +1,15 @@
 import { Token } from '@/config/tokens'
-import { dexAggregator } from '@/services/dex/dexAggregator'
 import { bridgeAggregator } from '@/services/bridge/bridgeAggregator'
-import { priceService } from '@/services/priceService'
 import {
-  SwapQuote,
-  QuoteRequest as DexQuoteRequest,
-} from '@/services/dex/types'
-import {
-  BridgeQuote,
-  BridgeRequest,
+    BridgeQuote,
+    BridgeRequest,
 } from '@/services/bridge/types'
+import { dexAggregator } from '@/services/dex/dexAggregator'
+import {
+    QuoteRequest as DexQuoteRequest,
+    SwapQuote,
+} from '@/services/dex/types'
+import { Address } from 'viem'
 
 export interface UnifiedQuoteRequest {
   fromToken: Token
@@ -190,7 +190,7 @@ export class QuoteEngine {
       toToken: request.toToken,
       amount: request.amount,
       slippage: request.slippage,
-      userAddress: request.userAddress,
+      userAddress: request.userAddress as Address,
       chainId: request.fromToken.chainId,
       protocols: request.protocols as any[],
       gasPrice: request.gasPrice,
@@ -217,7 +217,7 @@ export class QuoteEngine {
       fromChain: request.fromToken.chainId,
       toChain: request.toToken.chainId,
       amount: request.amount,
-      userAddress: request.userAddress,
+      userAddress: request.userAddress as Address,
       slippage: request.slippage,
       deadline: request.deadline,
       protocols: request.protocols as any[],
@@ -330,7 +330,7 @@ export class QuoteEngine {
    */
   private async optimizeQuotes(quotes: UnifiedQuote[], optimization: QuoteOptimization): Promise<UnifiedQuote[]> {
     // Filter quotes based on optimization criteria
-    let filtered = quotes.filter(quote => {
+    const filtered = quotes.filter(quote => {
       if (quote.priceImpact > optimization.maxPriceImpact) return false
       if (quote.slippage > optimization.maxSlippage) return false
       if (optimization.maxGasCost && parseFloat(quote.totalGas) > parseFloat(optimization.maxGasCost)) return false
@@ -376,7 +376,7 @@ export class QuoteEngine {
    */
   private selectBestQuote(quotes: UnifiedQuote[], optimization: QuoteOptimization): UnifiedQuote | undefined {
     if (quotes.length === 0) return undefined
-    
+
     // First quote is already the best after optimization
     return quotes[0]
   }
@@ -516,6 +516,3 @@ export class QuoteEngine {
 
 // Export singleton instance
 export const quoteEngine = new QuoteEngine()
-
-// Export class for custom instances
-export { QuoteEngine }

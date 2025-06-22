@@ -1,18 +1,17 @@
-import { Address } from 'viem'
 import { Token } from '@/config/tokens'
+import { Address } from 'viem'
 import { BaseBridgeService } from './baseBridgeService'
 import {
-  BridgeConfig,
-  BridgeRequest,
-  BridgeQuote,
-  BridgeTransaction,
-  BridgeParams,
-  BridgeStatus,
-  BridgeApiResponse,
-  LiquidityInfo,
-  BridgeRoute,
-  BridgeStep,
-  LayerZeroConfig
+    BridgeApiResponse,
+    BridgeConfig,
+    BridgeParams,
+    BridgeQuote,
+    BridgeRequest,
+    BridgeRoute,
+    BridgeStatus,
+    BridgeTransaction,
+    LayerZeroConfig,
+    LiquidityInfo
 } from './types'
 
 interface LayerZeroBridgeConfig extends BridgeConfig {
@@ -114,11 +113,11 @@ export class LayerZeroService extends BaseBridgeService {
       const quote = await this.getStargateQuote(request)
       return this.createResponse(quote)
     } catch (error) {
-      const bridgeError = error instanceof Error 
+      const bridgeError = error instanceof Error
         ? this.createError('API_ERROR', error.message)
         : this.createError('UNKNOWN_ERROR', 'Failed to get quote')
-      
-      return this.createResponse(undefined, bridgeError)
+
+      return this.createResponse(null as any, bridgeError)
     }
   }
 
@@ -135,8 +134,8 @@ export class LayerZeroService extends BaseBridgeService {
       const bridgeError = error instanceof Error
         ? this.createError('API_ERROR', error.message)
         : this.createError('UNKNOWN_ERROR', 'Failed to build transaction')
-      
-      return this.createResponse(undefined, bridgeError)
+
+      return this.createResponse(null as any, bridgeError)
     }
   }
 
@@ -167,8 +166,8 @@ export class LayerZeroService extends BaseBridgeService {
       const bridgeError = error instanceof Error
         ? this.createError('API_ERROR', error.message)
         : this.createError('UNKNOWN_ERROR', 'Failed to get status')
-      
-      return this.createResponse(undefined, bridgeError)
+
+      return this.createResponse(null as any, bridgeError)
     }
   }
 
@@ -198,8 +197,8 @@ export class LayerZeroService extends BaseBridgeService {
       const bridgeError = error instanceof Error
         ? this.createError('API_ERROR', error.message)
         : this.createError('UNKNOWN_ERROR', 'Failed to get supported tokens')
-      
-      return this.createResponse(undefined, bridgeError)
+
+      return this.createResponse([] as any, bridgeError)
     }
   }
 
@@ -245,8 +244,8 @@ export class LayerZeroService extends BaseBridgeService {
       const bridgeError = error instanceof Error
         ? this.createError('API_ERROR', error.message)
         : this.createError('UNKNOWN_ERROR', 'Failed to get liquidity')
-      
-      return this.createResponse(undefined, bridgeError)
+
+      return this.createResponse(null as any, bridgeError)
     }
   }
 

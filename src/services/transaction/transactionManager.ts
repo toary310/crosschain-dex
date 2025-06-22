@@ -1,18 +1,16 @@
 import { Address, Hash } from 'viem'
-import { 
-  Transaction, 
-  TransactionRequest, 
-  TransactionResponse, 
-  TransactionStatus, 
-  TransactionEvent, 
-  TransactionError, 
-  TransactionConfig,
-  TransactionQuery,
-  TransactionListResponse,
-  GasEstimation,
-  RecoveryOption,
-  BatchTransaction,
-  NonceManager
+import {
+    BatchTransaction,
+    NonceManager,
+    RecoveryOption,
+    Transaction,
+    TransactionConfig,
+    TransactionError,
+    TransactionEvent,
+    TransactionListResponse,
+    TransactionQuery,
+    TransactionRequest,
+    TransactionResponse
 } from './types'
 
 export interface TransactionManagerConfig extends TransactionConfig {
@@ -142,7 +140,7 @@ export class TransactionManager {
 
       // Submit to blockchain (placeholder - would integrate with wagmi/viem)
       const hash = await this.submitToBlockchain(transaction)
-      
+
       // Update transaction
       transaction.hash = hash
       transaction.status = 'submitted'
@@ -512,7 +510,7 @@ export class TransactionManager {
     setTimeout(() => {
       transaction.status = 'confirmed'
       transaction.confirmedAt = Date.now()
-      
+
       this.emitEvent({
         type: 'confirmed',
         transactionId: transaction.id,
@@ -523,7 +521,7 @@ export class TransactionManager {
       setTimeout(() => {
         transaction.status = 'success'
         transaction.completedAt = Date.now()
-        
+
         this.emitEvent({
           type: 'completed',
           transactionId: transaction.id,
@@ -620,14 +618,14 @@ class SimpleNonceManager implements NonceManager {
   async reserveNonce(address: Address, chainId: number, transactionId: string): Promise<number> {
     const key = `${chainId}-${address.toLowerCase()}`
     const nonce = await this.getNextNonce(address, chainId)
-    
+
     if (!this.reserved.has(key)) {
       this.reserved.set(key, new Set())
     }
-    
+
     this.reserved.get(key)!.add(nonce)
     this.nonces.set(key, nonce + 1)
-    
+
     return nonce
   }
 
@@ -644,6 +642,3 @@ class SimpleNonceManager implements NonceManager {
 
 // Export singleton instance
 export const transactionManager = new TransactionManager({}, new SimpleNonceManager())
-
-// Export classes for custom instances
-export { TransactionManager, SimpleNonceManager }

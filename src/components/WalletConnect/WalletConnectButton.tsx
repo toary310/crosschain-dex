@@ -70,10 +70,8 @@ export function WalletConnectButton() {
           <MenuItem
             key={connector.id}
             onClick={() => handleConnect(connector)}
-            isDisabled={!connector.ready}
           >
             {connector.name}
-            {!connector.ready && ' (unsupported)'}
           </MenuItem>
         ))}
       </MenuList>

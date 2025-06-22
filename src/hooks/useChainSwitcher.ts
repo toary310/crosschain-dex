@@ -1,8 +1,8 @@
 'use client'
 
-import { useChainId, useSwitchChain } from 'wagmi'
-import { useCallback } from 'react'
 import { getChainConfig, supportedChains } from '@/config/chains'
+import { useCallback } from 'react'
+import { useChainId, useSwitchChain } from 'wagmi'
 
 export function useChainSwitcher() {
   const chainId = useChainId()
@@ -12,11 +12,11 @@ export function useChainSwitcher() {
 
   const handleChainSwitch = useCallback((newChainId: string) => {
     const chainIdNumber = parseInt(newChainId)
-    switchChain({ chainId: chainIdNumber })
+    switchChain({ chainId: chainIdNumber as any })
   }, [switchChain])
 
   const switchToChain = useCallback((chainId: number) => {
-    switchChain({ chainId })
+    switchChain({ chainId: chainId as any })
   }, [switchChain])
 
   return {
@@ -24,7 +24,7 @@ export function useChainSwitcher() {
     chainId,
     currentChain,
     supportedChains,
-    
+
     // Actions
     handleChainSwitch,
     switchToChain,

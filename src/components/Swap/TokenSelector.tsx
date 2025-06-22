@@ -1,34 +1,33 @@
 'use client'
 
-import {
-  Box,
-  Button,
-  HStack,
-  VStack,
-  Text,
-  Input,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalCloseButton,
-  useDisclosure,
-  Avatar,
-  Badge,
-  Spinner,
-  Alert,
-  AlertIcon,
-  InputGroup,
-  InputLeftElement,
-  useColorModeValue,
-  Skeleton,
-  Divider,
-} from '@chakra-ui/react'
-import { useState, useEffect, useMemo } from 'react'
 import { Token } from '@/config/tokens'
-import { tokenRegistry } from '@/services/tokenRegistry'
 import { priceService } from '@/services/priceService'
+import { tokenRegistry } from '@/services/tokenRegistry'
+import {
+    Alert,
+    AlertIcon,
+    Avatar,
+    Badge,
+    Box,
+    Button,
+    Divider,
+    HStack,
+    Input,
+    InputGroup,
+    InputLeftElement,
+    Modal,
+    ModalBody,
+    ModalCloseButton,
+    ModalContent,
+    ModalHeader,
+    ModalOverlay,
+    Skeleton,
+    Text,
+    useColorModeValue,
+    useDisclosure,
+    VStack
+} from '@chakra-ui/react'
+import { useEffect, useMemo, useState } from 'react'
 
 interface TokenSelectorProps {
   selectedToken?: Token
@@ -85,9 +84,9 @@ export function TokenSelector({
             }
           })
         )
-        
+
         setTokens(tokensWithPrices)
-        
+
         // Set popular tokens (verified and with good liquidity)
         const popular = tokensWithPrices
           .filter(token => token.verified && token.tags?.includes('stablecoin') || token.isNative)
@@ -120,7 +119,7 @@ export function TokenSelector({
 
   // Exclude selected token from other selector
   const availableTokens = useMemo(() => {
-    return filteredTokens.filter(token => 
+    return filteredTokens.filter(token =>
       !excludeToken || token.address !== excludeToken.address
     )
   }, [filteredTokens, excludeToken])
@@ -242,7 +241,7 @@ export function TokenSelector({
                     Search Results
                   </Text>
                 )}
-                
+
                 {loading ? (
                   <VStack spacing={2}>
                     {[...Array(5)].map((_, i) => (
@@ -284,13 +283,13 @@ export function TokenSelector({
                           </VStack>
                         </HStack>
                         <VStack align="end" spacing={0}>
-                          {token.price && (
-                            <Text fontSize="sm">{formatPrice(token.price)}</Text>
+                          {(token as TokenWithPrice).price && (
+                            <Text fontSize="sm">{formatPrice((token as TokenWithPrice).price!)}</Text>
                           )}
-                          {formatChange(token.change24h)}
-                          {showBalance && token.balance && (
+                          {formatChange((token as TokenWithPrice).change24h)}
+                          {showBalance && (token as TokenWithPrice).balance && (
                             <Text fontSize="xs" color="gray.500">
-                              Balance: {token.balance}
+                              Balance: {(token as TokenWithPrice).balance}
                             </Text>
                           )}
                         </VStack>
