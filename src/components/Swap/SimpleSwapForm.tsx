@@ -1,30 +1,30 @@
 'use client'
 
-import React, { useState, useCallback, useEffect } from 'react'
-import {
-  Box,
-  VStack,
-  HStack,
-  Text,
-  Input,
-  InputGroup,
-  InputRightElement,
-  Button,
-  IconButton,
-  Card,
-  CardBody,
-  useColorModeValue,
-  useToast,
-  Spinner,
-  Alert,
-  AlertIcon,
-  AlertDescription,
-} from '@chakra-ui/react'
-import { FiArrowDown, FiRefreshCw } from 'react-icons/fi'
-import { useAccount, useBalance, useWriteContract, useWaitForTransactionReceipt } from 'wagmi'
-import { parseEther, formatEther } from 'viem'
-import { TokenSelector } from './TokenSelector'
 import { Token } from '@/config/tokens'
+import {
+    Alert,
+    AlertDescription,
+    AlertIcon,
+    Box,
+    Button,
+    Card,
+    CardBody,
+    HStack,
+    IconButton,
+    Input,
+    InputGroup,
+    InputRightElement,
+    Spinner,
+    Text,
+    useColorModeValue,
+    useToast,
+    VStack,
+} from '@chakra-ui/react'
+import React, { useCallback, useEffect, useState } from 'react'
+import { FiArrowDown, FiRefreshCw } from 'react-icons/fi'
+import { formatEther } from 'viem'
+import { useAccount, useBalance } from 'wagmi'
+import { TokenSelector } from './TokenSelector'
 
 interface SwapFormData {
   fromToken?: Token
@@ -49,9 +49,11 @@ export const SimpleSwapForm: React.FC<SimpleSwapFormProps> = ({ chainId }) => {
 
   const { address, isConnected } = useAccount()
   const toast = useToast()
-  
+
   const cardBg = useColorModeValue('white', 'gray.800')
   const borderColor = useColorModeValue('gray.200', 'gray.700')
+  const inputBg = useColorModeValue('gray.50', 'gray.700')
+  const quoteBg = useColorModeValue('gray.50', 'gray.700')
 
   // Get balance for from token
   const { data: balance } = useBalance({
@@ -72,11 +74,11 @@ export const SimpleSwapForm: React.FC<SimpleSwapFormProps> = ({ chainId }) => {
     try {
       // Simulate API call delay
       await new Promise(resolve => setTimeout(resolve, 1000))
-      
+
       // Mock quote calculation (replace with actual API call)
       const mockRate = 1.05 + Math.random() * 0.1
       const toAmount = (parseFloat(formData.fromAmount) * mockRate).toFixed(6)
-      
+
       setFormData(prev => ({ ...prev, toAmount }))
     } catch (error) {
       setQuoteError('Failed to get quote')
@@ -104,9 +106,9 @@ export const SimpleSwapForm: React.FC<SimpleSwapFormProps> = ({ chainId }) => {
 
   const handleMaxAmount = useCallback(() => {
     if (balance) {
-      setFormData(prev => ({ 
-        ...prev, 
-        fromAmount: formatEther(balance.value) 
+      setFormData(prev => ({
+        ...prev,
+        fromAmount: formatEther(balance.value)
       }))
     }
   }, [balance])
@@ -196,7 +198,7 @@ export const SimpleSwapForm: React.FC<SimpleSwapFormProps> = ({ chainId }) => {
                 Balance: {balance ? parseFloat(formatEther(balance.value)).toFixed(4) : '--'}
               </Text>
             </HStack>
-            
+
             <HStack spacing={3}>
               <Box flex={1}>
                 <TokenSelector
@@ -255,7 +257,7 @@ export const SimpleSwapForm: React.FC<SimpleSwapFormProps> = ({ chainId }) => {
                 Estimated
               </Text>
             </HStack>
-            
+
             <HStack spacing={3}>
               <Box flex={1}>
                 <TokenSelector
@@ -273,7 +275,7 @@ export const SimpleSwapForm: React.FC<SimpleSwapFormProps> = ({ chainId }) => {
                     isReadOnly
                     fontSize="lg"
                     textAlign="right"
-                    bg={useColorModeValue('gray.50', 'gray.700')}
+                    bg={inputBg}
                   />
                   {isQuoting && (
                     <InputRightElement>
@@ -287,7 +289,7 @@ export const SimpleSwapForm: React.FC<SimpleSwapFormProps> = ({ chainId }) => {
 
           {/* Quote Information */}
           {formData.fromToken && formData.toToken && formData.fromAmount && formData.toAmount && (
-            <Box p={4} bg={useColorModeValue('gray.50', 'gray.700')} borderRadius="lg">
+            <Box p={4} bg={quoteBg} borderRadius="lg">
               <VStack spacing={2}>
                 <HStack justify="space-between" w="full">
                   <Text fontSize="sm" color="gray.500">Rate</Text>
@@ -295,12 +297,12 @@ export const SimpleSwapForm: React.FC<SimpleSwapFormProps> = ({ chainId }) => {
                     1 {formData.fromToken.symbol} = {(parseFloat(formData.toAmount) / parseFloat(formData.fromAmount) || 0).toFixed(6)} {formData.toToken.symbol}
                   </Text>
                 </HStack>
-                
+
                 <HStack justify="space-between" w="full">
                   <Text fontSize="sm" color="gray.500">Slippage Tolerance</Text>
                   <Text fontSize="sm">{formData.slippage}%</Text>
                 </HStack>
-                
+
                 <HStack justify="space-between" w="full">
                   <Text fontSize="sm" color="gray.500">Network Fee</Text>
                   <Text fontSize="sm">~$2.50</Text>
@@ -325,7 +327,7 @@ export const SimpleSwapForm: React.FC<SimpleSwapFormProps> = ({ chainId }) => {
             onClick={handleSwap}
             w="full"
           >
-            {!isConnected ? 'Connect Wallet' : 
+            {!isConnected ? 'Connect Wallet' :
              !formData.fromToken || !formData.toToken ? 'Select Tokens' :
              !formData.fromAmount ? 'Enter Amount' :
              'Swap Tokens'}

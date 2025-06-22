@@ -1,4 +1,4 @@
-import { PerformanceMonitor } from '@/components/Performance/PerformanceMonitor'
+// import { PerformanceMonitor } from '@/components/Performance/PerformanceMonitor'
 import { RootProvider } from '@/providers/RootProvider'
 import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
@@ -117,7 +117,7 @@ export default function RootLayout({
       <body className="font-sans antialiased" suppressHydrationWarning>
         <RootProvider>
           {children}
-          <PerformanceMonitor />
+          {/* <PerformanceMonitor /> */}
         </RootProvider>
 
         {/* Service Worker Registration */}

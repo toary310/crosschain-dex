@@ -25,7 +25,7 @@ import {
     VStack
 } from '@chakra-ui/react'
 import { AnimatePresence, motion } from 'framer-motion'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { FiActivity, FiEyeOff, FiRefreshCw } from 'react-icons/fi'
 
 const MotionBox = motion(Box)
@@ -41,10 +41,10 @@ export const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({
 }) => {
   const { isOpen, onToggle } = useDisclosure()
   const [webVitals, setWebVitals] = useState<WebVitalsMetric[]>([])
-  const [renderCount, setRenderCount] = useState(0)
-  const [lastUpdate, setLastUpdate] = useState(Date.now())
+  const renderCountRef = useRef(0)
+  const lastUpdateRef = useRef(Date.now())
 
-  const { metrics, reportMetric } = usePerformanceObserver()
+  const { reportMetric } = usePerformanceObserver()
   const memoryInfo = useMemoryMonitor()
   const violations = usePerformanceBudget({
     bundleSize: 500000, // 500KB
@@ -54,15 +54,14 @@ export const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({
   const bg = useColorModeValue('white', 'gray.800')
   const borderColor = useColorModeValue('gray.200', 'gray.600')
 
+  // Increment render count on each render
+  renderCountRef.current += 1
+  lastUpdateRef.current = Date.now()
+
   // Don't show in production unless explicitly enabled
   if (process.env.NODE_ENV === 'production' && !showInProduction) {
     return null
   }
-
-  useEffect(() => {
-    setRenderCount(prev => prev + 1)
-    setLastUpdate(Date.now())
-  })
 
   // Load Web Vitals
   useEffect(() => {
@@ -205,7 +204,7 @@ export const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({
                 </Text>
                 <HStack spacing={1}>
                   <Badge colorScheme="blue" size="sm">
-                    {renderCount} renders
+                    {renderCountRef.current} renders
                   </Badge>
                   <IconButton
                     aria-label="Refresh metrics"
@@ -311,7 +310,7 @@ export const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({
 
               {/* Last Update */}
               <Text fontSize="xs" color="gray.400" textAlign="center">
-                Last update: {new Date(lastUpdate).toLocaleTimeString()}
+                Last update: {new Date(lastUpdateRef.current).toLocaleTimeString()}
               </Text>
             </VStack>
           </MotionBox>

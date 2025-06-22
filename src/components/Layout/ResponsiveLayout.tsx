@@ -88,10 +88,10 @@ export const ResponsiveLayout: React.FC<ResponsiveLayoutProps> = ({
 
   // Mobile navigation items
   const mobileNavItems = [
-    { icon: FiHome, label: 'Home', href: '/', badge: null },
-    { icon: FiTrendingUp, label: 'Swap', href: '/swap', badge: null },
-    { icon: FiPieChart, label: 'Pools', href: '/pools', badge: 'New' },
-    { icon: FiBarChart, label: 'Portfolio', href: '/portfolio', badge: '3' },
+    { icon: FiHome, label: 'ホーム', href: '/', badge: null },
+    { icon: FiTrendingUp, label: 'スワップ', href: '/swap', badge: null },
+    { icon: FiPieChart, label: 'プール', href: '/pools', badge: '新機能' },
+    { icon: FiBarChart, label: 'ポートフォリオ', href: '/portfolio', badge: '3' },
   ]
 
   // Sidebar component
