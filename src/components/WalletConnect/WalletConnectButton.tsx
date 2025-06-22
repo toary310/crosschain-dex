@@ -1,5 +1,7 @@
 'use client'
 
+import { useWalletConnection } from '@/hooks/useWalletConnection'
+import { useWalletNotifications } from '@/hooks/useWalletNotifications'
 import {
     Avatar,
     Button,
@@ -10,46 +12,25 @@ import {
     MenuList,
     Spinner,
     Text,
-    useToast,
 } from '@chakra-ui/react'
-// import { ChevronDownIcon } from '@chakra-ui/icons'
-import { useEffect } from 'react'
-import { useAccount, useConnect, useDisconnect } from 'wagmi'
 
 export function WalletConnectButton() {
-  const { address, isConnected, isConnecting } = useAccount()
-  const { connect, connectors, isPending } = useConnect()
-  const { disconnect } = useDisconnect()
-  const toast = useToast()
+  const {
+    address,
+    isConnected,
+    isConnecting,
+    isPending,
+    connectors,
+    handleConnect,
+    handleDisconnect,
+    formatAddress,
+  } = useWalletConnection()
 
-  useEffect(() => {
-    if (isConnected && address) {
-      toast({
-        title: 'Wallet Connected',
-        description: `Connected to ${address.slice(0, 6)}...${address.slice(-4)}`,
-        status: 'success',
-        duration: 3000,
-        isClosable: true,
-      })
-    }
-  }, [isConnected, address, toast])
+  const { showDisconnectNotification } = useWalletNotifications()
 
-  const handleConnect = (connector: any) => {
-    connect({ connector })
-  }
-
-  const handleDisconnect = () => {
-    disconnect()
-    toast({
-      title: 'Wallet Disconnected',
-      status: 'info',
-      duration: 2000,
-      isClosable: true,
-    })
-  }
-
-  const formatAddress = (address: string) => {
-    return `${address.slice(0, 6)}...${address.slice(-4)}`
+  const onDisconnect = () => {
+    handleDisconnect()
+    showDisconnectNotification()
   }
 
   if (isConnecting || isPending) {
@@ -71,7 +52,7 @@ export function WalletConnectButton() {
           </HStack>
         </MenuButton>
         <MenuList>
-          <MenuItem onClick={handleDisconnect}>
+          <MenuItem onClick={onDisconnect}>
             Disconnect Wallet
           </MenuItem>
         </MenuList>

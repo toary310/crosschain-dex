@@ -1,38 +1,18 @@
 'use client'
 
-import {
-    Box,
-    Button,
-    Flex,
-    HStack,
-    Menu,
-    MenuButton,
-    MenuItem,
-    MenuList,
-    Select,
-    Text,
-    useColorMode,
-    useColorModeValue
-} from '@chakra-ui/react'
-// import { MoonIcon, SunIcon, HamburgerIcon } from '@chakra-ui/icons'
+import { ChainSelector } from '@/components/Chain/ChainSelector'
+import { ErrorBoundary } from '@/components/ErrorBoundary/ErrorBoundary'
+import { Logo } from '@/components/Navigation/Logo'
+import { MainNavigation } from '@/components/Navigation/MainNavigation'
+import { MobileMenu } from '@/components/Navigation/MobileMenu'
+import { ColorModeToggle } from '@/components/Theme/ColorModeToggle'
 import { WalletConnectButton } from '@/components/WalletConnect/WalletConnectButton'
-import { getChainConfig, supportedChains } from '@/config/chains'
-import { useAccount, useChainId, useSwitchChain } from 'wagmi'
+import { UI_CONSTANTS } from '@/constants/ui'
+import { Box, Flex, HStack, useColorModeValue } from '@chakra-ui/react'
 
 export function Header() {
-  const { colorMode, toggleColorMode } = useColorMode()
   const bg = useColorModeValue('white', 'gray.800')
   const borderColor = useColorModeValue('gray.200', 'gray.700')
-
-  const { isConnected } = useAccount()
-  const chainId = useChainId()
-  const { switchChain } = useSwitchChain()
-
-  const currentChain = getChainConfig(chainId)
-
-  const handleChainSwitch = (newChainId: string) => {
-    switchChain({ chainId: parseInt(newChainId) })
-  }
 
   return (
     <Box
@@ -43,75 +23,32 @@ export function Header() {
       py={3}
       position="sticky"
       top={0}
-      zIndex={1000}
+      zIndex={UI_CONSTANTS.Z_INDEX.HEADER}
     >
       <Flex alignItems="center" justifyContent="space-between" maxW="7xl" mx="auto">
         {/* Logo */}
-        <HStack spacing={4}>
-          <Text fontSize="xl" fontWeight="bold" color="primary.500">
-            ChainBridge DEX
-          </Text>
-        </HStack>
+        <Logo />
 
         {/* Navigation */}
-        <HStack spacing={6} display={{ base: 'none', md: 'flex' }}>
-          <Button variant="ghost">Swap</Button>
-          <Button variant="ghost">Liquidity</Button>
-          <Button variant="ghost">Portfolio</Button>
-          <Button variant="ghost">Analytics</Button>
-        </HStack>
+        <MainNavigation />
 
         {/* Right side */}
         <HStack spacing={4}>
           {/* Chain Selector */}
-          {isConnected && (
-            <Select
-              value={chainId}
-              onChange={(e) => handleChainSwitch(e.target.value)}
-              width="auto"
-              size="sm"
-            >
-              {supportedChains.map((chain) => {
-                const config = getChainConfig(chain.id)
-                return (
-                  <option key={chain.id} value={chain.id}>
-                    {config.name}
-                  </option>
-                )
-              })}
-            </Select>
-          )}
+          <ErrorBoundary>
+            <ChainSelector />
+          </ErrorBoundary>
 
           {/* Color Mode Toggle */}
-          <Button
-            aria-label="Toggle color mode"
-            onClick={toggleColorMode}
-            variant="ghost"
-            size="sm"
-          >
-            {colorMode === 'light' ? '?' : '??'}
-          </Button>
+          <ColorModeToggle />
 
           {/* Wallet Connect */}
-          <WalletConnectButton />
+          <ErrorBoundary>
+            <WalletConnectButton />
+          </ErrorBoundary>
 
           {/* Mobile Menu */}
-          <Menu>
-            <MenuButton
-              as={Button}
-              aria-label="Open menu"
-              variant="ghost"
-              display={{ base: 'flex', md: 'none' }}
-            >
-              ?
-            </MenuButton>
-            <MenuList>
-              <MenuItem>Swap</MenuItem>
-              <MenuItem>Liquidity</MenuItem>
-              <MenuItem>Portfolio</MenuItem>
-              <MenuItem>Analytics</MenuItem>
-            </MenuList>
-          </Menu>
+          <MobileMenu />
         </HStack>
       </Flex>
     </Box>
