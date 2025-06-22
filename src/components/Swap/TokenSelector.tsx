@@ -27,7 +27,10 @@ import {
     useDisclosure,
     VStack
 } from '@chakra-ui/react'
+import { motion } from 'framer-motion'
 import { useEffect, useMemo, useState } from 'react'
+
+const MotionBox = motion(Box)
 
 interface TokenSelectorProps {
   selectedToken?: Token

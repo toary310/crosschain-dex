@@ -1,154 +1,70 @@
-import { extendTheme, type ThemeConfig } from '@chakra-ui/react'
+import { extendTheme } from '@chakra-ui/react'
+import { mode } from '@chakra-ui/theme-tools'
+import {
+    colors,
+    config,
+    fonts,
+    fontSizes,
+    radii,
+    shadows,
+    space,
+    transition
+} from './advanced'
+import { components } from './components'
 
-const config: ThemeConfig = {
-  initialColorMode: 'light',
-  useSystemColorMode: false,
-}
-
-const colors = {
-  primary: {
-    50: '#eff6ff',
-    100: '#dbeafe',
-    200: '#bfdbfe',
-    300: '#93c5fd',
-    400: '#60a5fa',
-    500: '#3b82f6',
-    600: '#2563eb',
-    700: '#1d4ed8',
-    800: '#1e40af',
-    900: '#1e3a8a',
-  },
-  gray: {
-    50: '#f9fafb',
-    100: '#f3f4f6',
-    200: '#e5e7eb',
-    300: '#d1d5db',
-    400: '#9ca3af',
-    500: '#6b7280',
-    600: '#4b5563',
-    700: '#374151',
-    800: '#1f2937',
-    900: '#111827',
-  },
-  success: {
-    50: '#ecfdf5',
-    100: '#d1fae5',
-    200: '#a7f3d0',
-    300: '#6ee7b7',
-    400: '#34d399',
-    500: '#10b981',
-    600: '#059669',
-    700: '#047857',
-    800: '#065f46',
-    900: '#064e3b',
-  },
-  warning: {
-    50: '#fffbeb',
-    100: '#fef3c7',
-    200: '#fde68a',
-    300: '#fcd34d',
-    400: '#fbbf24',
-    500: '#f59e0b',
-    600: '#d97706',
-    700: '#b45309',
-    800: '#92400e',
-    900: '#78350f',
-  },
-  error: {
-    50: '#fef2f2',
-    100: '#fee2e2',
-    200: '#fecaca',
-    300: '#fca5a5',
-    400: '#f87171',
-    500: '#ef4444',
-    600: '#dc2626',
-    700: '#b91c1c',
-    800: '#991b1b',
-    900: '#7f1d1d',
-  },
-}
-
-const fonts = {
-  heading: `'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"`,
-  body: `'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"`,
-}
-
-const components = {
-  Button: {
-    baseStyle: {
-      fontWeight: 'semibold',
-      borderRadius: 'lg',
-    },
-    sizes: {
-      sm: {
-        fontSize: 'sm',
-        px: 4,
-        py: 2,
-      },
-      md: {
-        fontSize: 'md',
-        px: 6,
-        py: 3,
-      },
-      lg: {
-        fontSize: 'lg',
-        px: 8,
-        py: 4,
-      },
-    },
-    variants: {
-      solid: {
-        bg: 'primary.500',
-        color: 'white',
-        _hover: {
-          bg: 'primary.600',
-          _disabled: {
-            bg: 'primary.500',
-          },
-        },
-      },
-      outline: {
-        border: '2px solid',
-        borderColor: 'primary.500',
-        color: 'primary.500',
-        _hover: {
-          bg: 'primary.50',
-          _dark: {
-            bg: 'primary.900',
-          },
-        },
-      },
-    },
-  },
-  Card: {
-    baseStyle: {
-      container: {
-        borderRadius: 'xl',
-        boxShadow: 'lg',
-        _dark: {
-          bg: 'gray.800',
-          borderColor: 'gray.700',
-        },
-      },
-    },
-  },
-}
-
+// Global styles with enhanced theming
 const styles = {
-  global: {
+  global: (props: any) => ({
     body: {
-      bg: 'gray.50',
-      _dark: {
-        bg: 'gray.900',
-      },
+      bg: mode('gray.50', 'gray.900')(props),
+      color: mode('gray.900', 'gray.50')(props),
+      transition: 'background-color 0.2s, color 0.2s',
+      fontFeatureSettings: '"cv02", "cv03", "cv04", "cv11"',
+      fontVariantNumeric: 'oldstyle-nums',
+      textRendering: 'optimizeLegibility',
     },
-  },
+    '*': {
+      borderColor: mode('gray.200', 'gray.700')(props),
+    },
+    '*::placeholder': {
+      color: mode('gray.400', 'gray.500')(props),
+    },
+    '*, *::before, &::after': {
+      borderColor: mode('gray.200', 'gray.700')(props),
+      wordWrap: 'break-word',
+    },
+    // Scrollbar styling
+    '::-webkit-scrollbar': {
+      width: '8px',
+    },
+    '::-webkit-scrollbar-track': {
+      bg: mode('gray.100', 'gray.800')(props),
+    },
+    '::-webkit-scrollbar-thumb': {
+      bg: mode('gray.300', 'gray.600')(props),
+      borderRadius: 'full',
+    },
+    '::-webkit-scrollbar-thumb:hover': {
+      bg: mode('gray.400', 'gray.500')(props),
+    },
+    // Focus styles
+    ':focus-visible': {
+      outline: '2px solid',
+      outlineColor: 'primary.500',
+      outlineOffset: '2px',
+    },
+  }),
 }
 
 export const theme = extendTheme({
   config,
   colors,
   fonts,
+  fontSizes,
+  space,
+  shadows,
+  radii,
+  transition,
   components,
   styles,
 })
