@@ -1,5 +1,5 @@
-import { http, createConfig } from 'wagmi'
-import { mainnet, polygon, arbitrum, optimism } from 'wagmi/chains'
+import { createConfig, http } from 'wagmi'
+import { arbitrum, avalanche, mainnet, optimism, polygon } from 'wagmi/chains'
 import { injected, metaMask, walletConnect } from 'wagmi/connectors'
 
 // Get WalletConnect project ID from environment variables
@@ -10,7 +10,7 @@ if (!projectId) {
 }
 
 export const config = createConfig({
-  chains: [mainnet, polygon, arbitrum, optimism],
+  chains: [mainnet, polygon, arbitrum, optimism, avalanche],
   connectors: [
     injected(),
     metaMask(),
@@ -21,6 +21,7 @@ export const config = createConfig({
     [polygon.id]: http(),
     [arbitrum.id]: http(),
     [optimism.id]: http(),
+    [avalanche.id]: http(),
   },
 })
 

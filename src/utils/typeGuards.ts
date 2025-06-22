@@ -1,7 +1,7 @@
 import { NavigationItemId } from '@/constants/navigation'
 
 export function isValidNavigationId(id: string): id is NavigationItemId {
-  return ['swap', 'liquidity', 'portfolio', 'analytics'].includes(id)
+  return ['swap', 'pools', 'portfolio', 'analytics'].includes(id)
 }
 
 export function isValidChainId(chainId: unknown): chainId is number {

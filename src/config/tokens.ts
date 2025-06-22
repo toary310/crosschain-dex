@@ -1,5 +1,5 @@
 import { Address } from 'viem'
-import { mainnet, polygon, arbitrum, optimism } from 'wagmi/chains'
+import { arbitrum, mainnet, optimism, polygon } from 'wagmi/chains'
 
 export interface Token {
   address: Address
@@ -125,7 +125,7 @@ export const COMMON_TOKENS: Record<number, Token[]> = {
 export const getAllTokensForChain = (chainId: number): Token[] => {
   const nativeToken = NATIVE_TOKENS[chainId]
   const commonTokens = COMMON_TOKENS[chainId] || []
-  
+
   return nativeToken ? [nativeToken, ...commonTokens] : commonTokens
 }
 

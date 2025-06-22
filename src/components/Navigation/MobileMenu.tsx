@@ -5,22 +5,25 @@ import { EMOJI_ICONS } from '@/constants/ui'
 import { useUIStore } from '@/store/useUIStore'
 import { isValidNavigationId } from '@/utils/typeGuards'
 import {
-    Button,
-    Menu,
-    MenuButton,
-    MenuItem,
-    MenuList,
+  Button,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
 } from '@chakra-ui/react'
+import { useRouter } from 'next/navigation'
 import { memo, useCallback } from 'react'
 
 export const MobileMenu = memo(function MobileMenu() {
   const { setActiveTab } = useUIStore()
+  const router = useRouter()
 
-  const handleItemClick = useCallback((itemId: string) => {
+  const handleItemClick = useCallback((itemId: string, path: string) => {
     if (isValidNavigationId(itemId)) {
       setActiveTab(itemId)
+      router.push(path)
     }
-  }, [setActiveTab])
+  }, [setActiveTab, router])
 
   return (
     <Menu>
@@ -36,7 +39,7 @@ export const MobileMenu = memo(function MobileMenu() {
         {NAVIGATION_ITEMS.map((item) => (
           <MenuItem
             key={item.id}
-            onClick={() => handleItemClick(item.id)}
+            onClick={() => handleItemClick(item.id, item.path)}
           >
             {item.label}
           </MenuItem>

@@ -1,6 +1,6 @@
-import { mainnet, polygon, arbitrum, optimism } from 'wagmi/chains'
+import { arbitrum, avalanche, mainnet, optimism, polygon } from 'wagmi/chains'
 
-export const supportedChains = [mainnet, polygon, arbitrum, optimism] as const
+export const supportedChains = [mainnet, polygon, arbitrum, optimism, avalanche] as const
 
 export type SupportedChainId = (typeof supportedChains)[number]['id']
 
@@ -38,6 +38,15 @@ export const chainConfig = {
     icon: '/icons/optimism.svg',
     color: '#FF0420',
     blockExplorer: 'https://optimistic.etherscan.io',
+    priority: 'medium' as const,
+    phase: 2,
+  },
+  [avalanche.id]: {
+    name: 'Avalanche',
+    shortName: 'AVAX',
+    icon: '/icons/avalanche.svg',
+    color: '#E84142',
+    blockExplorer: 'https://snowtrace.io',
     priority: 'medium' as const,
     phase: 2,
   },
